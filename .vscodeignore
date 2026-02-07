@@ -1,0 +1,12 @@
+.vscode/**
+.vscode-test/**
+src/**
+test/**
+webview-ui/src/**
+webview-ui/node_modules/**
+node_modules/**
+.gitignore
+tsconfig.json
+**/*.ts
+**/*.map
+*.lock*

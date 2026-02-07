@@ -1,0 +1,135 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* CSS変数のデフォルト値（ダークモード） */
+:root {
+  --scrollbar-track: #1e1e1e;
+  --scrollbar-thumb: #555;
+  --scrollbar-thumb-hover: #666;
+  --bg-primary: #1e1e1e;
+  --text-primary: #cccccc;
+}
+
+/* ライトモード */
+body[data-vscode-theme="light"] {
+  --scrollbar-track: #f3f3f3;
+  --scrollbar-thumb: #c1c1c1;
+  --scrollbar-thumb-hover: #a0a0a0;
+  --bg-primary: #ffffff;
+  --text-primary: #333333;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  overflow: hidden;
+}
+
+/* 日付ピッカーのスタイル改善 */
+input[type="date"] {
+  color-scheme: dark;
+  background-color: #2a2a2a !important;
+  color: #fff !important;
+}
+
+body[data-vscode-theme="light"] input[type="date"] {
+  color-scheme: light;
+  background-color: #ffffff !important;
+  color: #333 !important;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(2);
+  cursor: pointer;
+  opacity: 1;
+}
+
+body[data-vscode-theme="light"] input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: none;
+}
+
+input[type="date"]::-webkit-datetime-edit {
+  color: #fff;
+}
+
+body[data-vscode-theme="light"] input[type="date"]::-webkit-datetime-edit {
+  color: #333;
+}
+
+input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+  color: #fff;
+}
+
+body[data-vscode-theme="light"] input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+  color: #333;
+}
+
+input[type="date"]::-webkit-datetime-edit-year-field,
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field {
+  color: #fff;
+}
+
+body[data-vscode-theme="light"] input[type="date"]::-webkit-datetime-edit-year-field,
+body[data-vscode-theme="light"] input[type="date"]::-webkit-datetime-edit-month-field,
+body[data-vscode-theme="light"] input[type="date"]::-webkit-datetime-edit-day-field {
+  color: #333;
+}
+
+/* スクロールバー - ダークモード（デフォルト） */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+/* スクロールバー - ライトモード */
+body[data-vscode-theme="light"] ::-webkit-scrollbar-track,
+body.light-theme ::-webkit-scrollbar-track {
+  background: #f3f3f3;
+}
+
+body[data-vscode-theme="light"] ::-webkit-scrollbar-thumb,
+body.light-theme ::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+}
+
+body[data-vscode-theme="light"] ::-webkit-scrollbar-thumb:hover,
+body.light-theme ::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0;
+}
+
+/* Timelineの縦スクロールバーを非表示 */
+.timeline-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.timeline-container::-webkit-scrollbar:vertical {
+  width: 0;
+}
+
+/* ドラッグ中のスタイル */
+.dragging {
+  opacity: 0.5;
+}
+
+.drag-over {
+  background-color: rgba(0, 122, 204, 0.2) !important;
+}

@@ -2,6 +2,15 @@ import React from 'react';
 import { ViewMode, ThemeMode } from '../types';
 import { ThemeColors } from '../theme';
 import { Plus, Calendar, CalendarDays, CalendarRange, Navigation, Sun, Moon } from 'lucide-react';
+import {
+  BTN_ADD,
+  BTN_TODAY,
+  BTN_DAY,
+  BTN_WEEK,
+  BTN_MONTH,
+  TOOLTIP_SWITCH_TO_LIGHT,
+  TOOLTIP_SWITCH_TO_DARK,
+} from '../constants/strings';
 
 interface ToolbarProps {
   viewMode: ViewMode;
@@ -32,7 +41,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
       borderBottom: `1px solid ${theme.border}`,
       gap: '8px',
     }}>
-      {/* 左側: タスク追加 */}
+      {/* Left side: Add task */}
       <button
         onClick={onAddTask}
         style={{
@@ -50,13 +59,13 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         }}
       >
         <Plus size={12} />
-        追加
+        {BTN_ADD}
       </button>
 
-      {/* 区切り線 */}
+      {/* Divider */}
       <div style={{ width: 1, height: 20, backgroundColor: theme.borderLight }} />
 
-      {/* 今日へ移動 */}
+      {/* Go to today */}
       <button
         onClick={onTodayClick}
         style={{
@@ -73,10 +82,10 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         }}
       >
         <Navigation size={10} />
-        今日
+        {BTN_TODAY}
       </button>
 
-      {/* 日/週/月 切替 */}
+      {/* Day/Week/Month toggle */}
       <div style={{ display: 'flex', border: `1px solid ${theme.borderLight}`, borderRadius: '3px', overflow: 'hidden' }}>
         <button
           onClick={() => onViewModeChange('day')}
@@ -93,7 +102,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           }}
         >
           <Calendar size={10} />
-          日
+          {BTN_DAY}
         </button>
         <button
           onClick={() => onViewModeChange('week')}
@@ -111,7 +120,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           }}
         >
           <CalendarDays size={10} />
-          週
+          {BTN_WEEK}
         </button>
         <button
           onClick={() => onViewModeChange('month')}
@@ -129,14 +138,14 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           }}
         >
           <CalendarRange size={10} />
-          月
+          {BTN_MONTH}
         </button>
       </div>
 
-      {/* スペーサー */}
+      {/* Spacer */}
       <div style={{ flex: 1 }} />
 
-      {/* テーマ切替 */}
+      {/* Theme toggle */}
       <button
         onClick={() => onThemeChange(themeMode === 'dark' ? 'light' : 'dark')}
         style={{
@@ -151,7 +160,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           gap: 4,
           fontSize: 10,
         }}
-        title={themeMode === 'dark' ? 'ライトモードに切替' : 'ダークモードに切替'}
+        title={themeMode === 'dark' ? TOOLTIP_SWITCH_TO_LIGHT : TOOLTIP_SWITCH_TO_DARK}
       >
         {themeMode === 'dark' ? <Sun size={12} /> : <Moon size={12} />}
       </button>

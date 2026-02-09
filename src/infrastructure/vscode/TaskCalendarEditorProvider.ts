@@ -14,7 +14,7 @@ export class TaskCalendarEditorProvider implements vscode.CustomTextEditorProvid
   private readonly manageDeadlineUseCase = new ManageDeadlineUseCase();
   private readonly resizeTaskUseCase = new ResizeTaskUseCase();
   
-  // 保存処理のキュー
+  // Save processing queue
   private saveQueue: Promise<void> = Promise.resolve();
 
   public static register(context: vscode.ExtensionContext): vscode.Disposable {
@@ -113,11 +113,11 @@ export class TaskCalendarEditorProvider implements vscode.CustomTextEditorProvid
       case 'openLink': {
         const url = message.payload?.url;
         if (url) {
-          // ファイルパス/フォルダパスの判定
+          // Check if file path or folder path
           const isFilePath = url.startsWith('/') || url.startsWith('~') || /^[A-Za-z]:[\\/]/.test(url) || url.startsWith('file://');
           
           if (isFilePath) {
-            // ファイルパスの場合
+            // If file path
             let filePath = url;
             if (url.startsWith('file://')) {
               filePath = vscode.Uri.parse(url).fsPath;
@@ -126,21 +126,21 @@ export class TaskCalendarEditorProvider implements vscode.CustomTextEditorProvid
               filePath = url.replace('~', home);
             }
             const uri = vscode.Uri.file(filePath);
-            // フォルダかファイルかを判定して開く
+            // Check if folder or file and open accordingly
             vscode.workspace.fs.stat(uri).then(stat => {
               if (stat.type === vscode.FileType.Directory) {
-                // フォルダの場合はOSのファイルマネージャーで開く
+                // If folder, open in OS file manager
                 vscode.env.openExternal(uri);
               } else {
-                // ファイルの場合はVSCodeで開く
+                // If file, open in VS Code
                 vscode.commands.executeCommand('vscode.open', uri);
               }
             }, () => {
-              // 存在しない場合でも試みる
+              // If not exists, try anyway
               vscode.env.openExternal(uri);
             });
           } else {
-            // URLの場合
+            // If URL
             vscode.env.openExternal(vscode.Uri.parse(url));
           }
         }
@@ -151,7 +151,7 @@ export class TaskCalendarEditorProvider implements vscode.CustomTextEditorProvid
   }
 
   private async saveDocument(document: vscode.TextDocument, calendar: TaskCalendar): Promise<void> {
-    // 保存処理をキューに追加してシリアライズ
+    // Add save processing to queue and serialize
     this.saveQueue = this.saveQueue.then(async () => {
       try {
         const edit = new vscode.WorkspaceEdit();
@@ -184,11 +184,11 @@ export class TaskCalendarEditorProvider implements vscode.CustomTextEditorProvid
     const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'webview-ui', 'dist', 'index.js'));
     const styleUri = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'webview-ui', 'dist', 'index.css'));
     const nonce = getNonce();
-    // VSCodeのテーマを判定してdatasetに設定
+    // Detect VS Code theme and set in dataset
     const colorTheme = vscode.window.activeColorTheme;
     const isDarkTheme = colorTheme.kind === vscode.ColorThemeKind.Dark || colorTheme.kind === vscode.ColorThemeKind.HighContrast;
     const themeMode = isDarkTheme ? 'dark' : 'light';
-    return `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}';"><link href="${styleUri}" rel="stylesheet"><title>Task Calendar</title></head><body data-vscode-theme="${themeMode}"><div id="root"></div><script nonce="${nonce}" src="${scriptUri}"></script></body></html>`;
+    return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}';"><link href="${styleUri}" rel="stylesheet"><title>Task Calendar</title></head><body data-vscode-theme="${themeMode}"><div id="root"></div><script nonce="${nonce}" src="${scriptUri}"></script></body></html>`;
   }
 }
 

@@ -4,6 +4,25 @@ import { ThemeColors } from '../theme';
 import { formatDateInput, formatDate } from '../utils/dateUtils';
 import { X, Plus, Trash2, ExternalLink, Check, Clock, Play, CheckCircle2, Palette } from 'lucide-react';
 import { DateInput } from './DateInput';
+import {
+  STATUS_WAITING,
+  STATUS_IN_PROGRESS,
+  STATUS_COMPLETED,
+  COLOR_LABELS,
+  LABEL_TASK_DETAILS,
+  LABEL_STATUS,
+  LABEL_TASK_COLOR,
+  LABEL_TITLE,
+  LABEL_DATE_RANGE,
+  LABEL_START,
+  LABEL_END,
+  LABEL_LINK,
+  LABEL_MEMO,
+  LABEL_DEADLINE_LIST,
+  BTN_DELETE_TASK,
+  BTN_CONFIRM,
+  PLACEHOLDER_ENTER_CONTENT,
+} from '../constants/strings';
 
 interface TaskDetailProps {
   task: Task | null;
@@ -21,12 +40,12 @@ interface TaskDetailProps {
 }
 
 const STATUS_OPTIONS: { value: TaskStatus; label: string; Icon: React.ElementType }[] = [
-  { value: 'waiting', label: '待機', Icon: Clock },
-  { value: 'in-progress', label: '実行中', Icon: Play },
-  { value: 'completed', label: '完了', Icon: CheckCircle2 },
+  { value: 'waiting', label: STATUS_WAITING, Icon: Clock },
+  { value: 'in-progress', label: STATUS_IN_PROGRESS, Icon: Play },
+  { value: 'completed', label: STATUS_COMPLETED, Icon: CheckCircle2 },
 ];
 
-// 締切タイトル入力用コンポーネント（IME対応）
+// Deadline title input component (with IME support)
 const DeadlineTitleInput: React.FC<{
   value: string;
   completed: boolean;
@@ -57,7 +76,7 @@ const DeadlineTitleInput: React.FC<{
           e.currentTarget.blur();
         }
       }}
-      placeholder="内容を入力..."
+      placeholder={PLACEHOLDER_ENTER_CONTENT}
       style={{
         width: '100%',
         padding: '6px 8px',
@@ -87,10 +106,10 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({
   onClose,
   onOpenLink,
 }) => {
-  // taskColorsからCOLOR_OPTIONS相当の配列を生成
+  // Generate COLOR_OPTIONS array from taskColors
   const COLOR_OPTIONS = Object.entries(taskColors).map(([value, colors]) => ({
     value: value as TaskColor,
-    label: { blue: '青', cyan: '水', green: '緑', yellow: '黄', orange: '橙', red: '赤', pink: '桃', purple: '紫', gray: '灰' }[value] || value,
+    label: COLOR_LABELS[value] || value,
     bg: colors.bg,
     border: colors.border,
   }));
@@ -165,18 +184,18 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({
 
   return (
     <div style={{ width: 320, backgroundColor: theme.bgSecondary, borderLeft: `1px solid ${theme.border}`, display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
-      {/* ヘッダー */}
+      {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', backgroundColor: theme.bgTertiary, borderBottom: `1px solid ${theme.border}` }}>
-        <span style={{ fontSize: 12, fontWeight: 600, color: theme.textPrimary }}>タスク詳細</span>
+        <span style={{ fontSize: 12, fontWeight: 600, color: theme.textPrimary }}>{LABEL_TASK_DETAILS}</span>
         <button onClick={onClose} style={{ background: 'none', border: 'none', color: theme.textMuted, cursor: 'pointer', display: 'flex' }}>
           <X size={14} />
         </button>
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto', padding: 12 }}>
-        {/* ステータス */}
+        {/* Status */}
         <div style={{ marginBottom: 12 }}>
-          <label style={{ display: 'block', fontSize: 9, color: theme.textMuted, marginBottom: 4 }}>ステータス</label>
+          <label style={{ display: 'block', fontSize: 9, color: theme.textMuted, marginBottom: 4 }}>{LABEL_STATUS}</label>
           <div style={{ display: 'flex', gap: 4 }}>
             {STATUS_OPTIONS.map(opt => {
               const isActive = task.status === opt.value;
@@ -207,11 +226,11 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({
           </div>
         </div>
 
-        {/* 色 */}
+        {/* Color */}
         <div style={{ marginBottom: 12 }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 9, color: theme.textMuted, marginBottom: 4 }}>
             <Palette size={10} />
-            タスクカラー
+            {LABEL_TASK_COLOR}
           </label>
           <div style={{ display: 'flex', gap: 4 }}>
             {COLOR_OPTIONS.map(opt => (
@@ -233,9 +252,9 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({
           </div>
         </div>
 
-        {/* タイトル */}
+        {/* Title */}
         <div style={{ marginBottom: 12 }}>
-          <label style={{ display: 'block', fontSize: 9, color: theme.textMuted, marginBottom: 4 }}>タイトル</label>
+          <label style={{ display: 'block', fontSize: 9, color: theme.textMuted, marginBottom: 4 }}>{LABEL_TITLE}</label>
           <input
             type="text"
             value={title}
@@ -244,26 +263,26 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({
           />
         </div>
 
-        {/* 日付範囲 */}
+        {/* Date Range */}
         <div style={{ marginBottom: 12 }}>
           <label style={{ display: 'block', fontSize: 9, color: theme.textMuted, marginBottom: 4 }}>
-            日付範囲
+            {LABEL_DATE_RANGE}
           </label>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ fontSize: 9, color: theme.textMuted, width: 24 }}>開始</span>
+              <span style={{ fontSize: 9, color: theme.textMuted, width: 24 }}>{LABEL_START}</span>
               <DateInput value={startDate} onChange={handleStartDateChange} style={{ flex: 1 }} theme={themeMode} />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ fontSize: 9, color: theme.textMuted, width: 24 }}>終了</span>
+              <span style={{ fontSize: 9, color: theme.textMuted, width: 24 }}>{LABEL_END}</span>
               <DateInput value={endDate} onChange={handleEndDateChange} style={{ flex: 1 }} theme={themeMode} />
             </div>
           </div>
         </div>
 
-        {/* リンク */}
+        {/* Link */}
         <div style={{ marginBottom: 12 }}>
-          <label style={{ display: 'block', fontSize: 9, color: theme.textMuted, marginBottom: 4 }}>リンク</label>
+          <label style={{ display: 'block', fontSize: 9, color: theme.textMuted, marginBottom: 4 }}>{LABEL_LINK}</label>
           <div style={{ display: 'flex', gap: 6 }}>
             <input
               type="text"
@@ -283,9 +302,9 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({
           </div>
         </div>
 
-        {/* メモ */}
+        {/* Memo */}
         <div style={{ marginBottom: 12 }}>
-          <label style={{ display: 'block', fontSize: 9, color: theme.textMuted, marginBottom: 4 }}>メモ</label>
+          <label style={{ display: 'block', fontSize: 9, color: theme.textMuted, marginBottom: 4 }}>{LABEL_MEMO}</label>
           <textarea
             value={memo}
             onChange={e => handleMemoChange(e.target.value)}
@@ -294,10 +313,10 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({
           />
         </div>
 
-        {/* 締切リスト */}
+        {/* Deadline List */}
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-            <label style={{ fontSize: 9, color: theme.textMuted }}>締切リスト ({task.deadlines.length})</label>
+            <label style={{ fontSize: 9, color: theme.textMuted }}>{LABEL_DEADLINE_LIST} ({task.deadlines.length})</label>
             <button
               onClick={onAddDeadline}
               style={{ width: 18, height: 18, backgroundColor: theme.accent, color: '#fff', border: 'none', borderRadius: 2, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -308,16 +327,16 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {[...task.deadlines]
               .sort((a, b) => {
-                // 日付がないものは最後に
+                // Items without dates go last
                 if (!a.date && !b.date) return 0;
                 if (!a.date) return 1;
                 if (!b.date) return -1;
-                // 日付順（昇順）
+                // Sort by date (ascending)
                 return new Date(a.date).getTime() - new Date(b.date).getTime();
               })
               .map(dl => (
               <div key={dl.id} style={{ padding: '8px', backgroundColor: theme.bgPrimary, border: `1px solid ${theme.border}`, borderRadius: 3 }}>
-                {/* 1行目: チェック、日付、削除ボタン */}
+                {/* Row 1: Check, Date, Delete button */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
                   <button
                     onClick={() => onToggleDeadline(dl.id)}
@@ -351,7 +370,7 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({
                     <Trash2 size={12} />
                   </button>
                 </div>
-                {/* 2行目: 内容入力欄（幅いっぱい） */}
+                {/* Row 2: Content input (full width) */}
                 <DeadlineTitleInput
                   value={dl.title}
                   completed={dl.completed}
@@ -364,7 +383,7 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({
         </div>
       </div>
 
-      {/* フッター */}
+      {/* Footer */}
       <div style={{ padding: 10, borderTop: `1px solid ${theme.border}` }}>
         <button
           onClick={handleDelete}
@@ -385,7 +404,7 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({
           }}
         >
           <Trash2 size={11} />
-          {showDeleteConfirm ? '確認' : 'タスクを削除'}
+          {showDeleteConfirm ? BTN_CONFIRM : BTN_DELETE_TASK}
         </button>
       </div>
     </div>

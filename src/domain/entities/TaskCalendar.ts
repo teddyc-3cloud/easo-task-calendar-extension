@@ -1,5 +1,5 @@
 /**
- * TaskCalendar Entity - タスクカレンダーの集約ルート
+ * TaskCalendar Entity - Aggregate root for the task calendar
  */
 
 import { Task, TaskStatus, createTask, validateTask, ValidationError } from './Task';

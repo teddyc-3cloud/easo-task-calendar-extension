@@ -18,10 +18,10 @@ describe('EditTaskUseCase', () => {
       const { calendar: calWithTask, newTask } = addUseCase.execute(calendar);
       const result = editUseCase.execute(calWithTask, {
         taskId: newTask.id,
-        title: '更新されたタイトル',
+        title: 'Updated Title',
       });
       assert.strictEqual(result.success, true);
-      assert.strictEqual(result.task?.title, '更新されたタイトル');
+      assert.strictEqual(result.task?.title, 'Updated Title');
       assert.strictEqual(result.errors.length, 0);
     });
 
@@ -30,10 +30,10 @@ describe('EditTaskUseCase', () => {
       const { calendar: calWithTask, newTask } = addUseCase.execute(calendar);
       const result = editUseCase.execute(calWithTask, {
         taskId: newTask.id,
-        memo: '新しいメモ',
+        memo: 'New Memo',
       });
       assert.strictEqual(result.success, true);
-      assert.strictEqual(result.task?.memo, '新しいメモ');
+      assert.strictEqual(result.task?.memo, 'New Memo');
     });
 
     it('should edit task link', () => {
@@ -113,14 +113,14 @@ describe('EditTaskUseCase', () => {
       const { calendar: calWithTask, newTask } = addUseCase.execute(calendar);
       const result = editUseCase.execute(calWithTask, {
         taskId: newTask.id,
-        title: '複数更新',
-        memo: 'メモも更新',
+        title: 'Multiple Update',
+        memo: 'Memo Updated',
         status: 'completed',
         priority: 'high',
       });
       assert.strictEqual(result.success, true);
-      assert.strictEqual(result.task?.title, '複数更新');
-      assert.strictEqual(result.task?.memo, 'メモも更新');
+      assert.strictEqual(result.task?.title, 'Multiple Update');
+      assert.strictEqual(result.task?.memo, 'Memo Updated');
       assert.strictEqual(result.task?.status, 'completed');
       assert.strictEqual(result.task?.priority, 'high');
     });
@@ -128,16 +128,16 @@ describe('EditTaskUseCase', () => {
     it('should preserve unedited fields', () => {
       const calendar = createTaskCalendar();
       const { calendar: calWithTask, newTask } = addUseCase.execute(calendar, {
-        title: '元のタイトル',
-        memo: '元のメモ',
+        title: 'Original Title',
+        memo: 'Original Memo',
       });
       const result = editUseCase.execute(calWithTask, {
         taskId: newTask.id,
-        title: '新しいタイトル',
+        title: 'New Title',
       });
       assert.strictEqual(result.success, true);
-      assert.strictEqual(result.task?.title, '新しいタイトル');
-      assert.strictEqual(result.task?.memo, '元のメモ');
+      assert.strictEqual(result.task?.title, 'New Title');
+      assert.strictEqual(result.task?.memo, 'Original Memo');
     });
   });
 });

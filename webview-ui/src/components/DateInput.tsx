@@ -1,16 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { WEEKDAYS, BTN_TODAY, formatMonthYear } from '../constants/strings';
 
 interface DateInputProps {
-  value: string; // yyyy-mm-dd形式または空
+  value: string; // yyyy-mm-dd format or empty
   onChange: (value: string) => void;
   placeholder?: string;
   style?: React.CSSProperties;
-  compact?: boolean; // コンパクトモード（締切用）
+  compact?: boolean; // Compact mode (for deadlines)
   theme?: 'dark' | 'light';
 }
 
-// テーマカラー
+// Theme colors
 const themes = {
   dark: {
     inputBg: '#2a2a2a',
@@ -56,7 +57,7 @@ export const DateInput: React.FC<DateInputProps> = ({
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // value (yyyy-mm-dd) からdisplayValue (yyyy/mm/dd) に変換
+  // Convert value (yyyy-mm-dd) to displayValue (yyyy/mm/dd)
   useEffect(() => {
     if (value) {
       const parts = value.split('-');
@@ -69,7 +70,7 @@ export const DateInput: React.FC<DateInputProps> = ({
     }
   }, [value]);
 
-  // 外部クリックでカレンダーを閉じる
+  // Close calendar on click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -80,7 +81,7 @@ export const DateInput: React.FC<DateInputProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // displayValue (yyyy/mm/dd) からvalue (yyyy-mm-dd) に変換 - カレンダー選択用
+  // Convert displayValue (yyyy/mm/dd) to value (yyyy-mm-dd) - for calendar selection
   const handleDateSelect = (date: Date) => {
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -110,7 +111,7 @@ export const DateInput: React.FC<DateInputProps> = ({
     for (let i = 0; i < firstDay; i++) days.push(null);
     for (let i = 1; i <= daysInMonth; i++) days.push(i);
 
-    const weekDays = ['日', '月', '火', '水', '木', '金', '土'];
+    const weekDays = WEEKDAYS;
 
     return (
       <div style={{
@@ -125,20 +126,20 @@ export const DateInput: React.FC<DateInputProps> = ({
         boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
         minWidth: 200,
       }}>
-        {/* ヘッダー */}
+        {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <button onClick={prevMonth} style={{ background: 'none', border: 'none', color: colors.buttonText, cursor: 'pointer', padding: 4 }}>
             <ChevronLeft size={14} />
           </button>
           <span style={{ fontSize: 11, color: colors.calendarHeaderText, fontWeight: 600 }}>
-            {year}年{month + 1}月
+            {formatMonthYear(month + 1, year)}
           </span>
           <button onClick={nextMonth} style={{ background: 'none', border: 'none', color: colors.buttonText, cursor: 'pointer', padding: 4 }}>
             <ChevronRight size={14} />
           </button>
         </div>
 
-        {/* 曜日 */}
+        {/* Weekdays */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 1, marginBottom: 4 }}>
           {weekDays.map((wd, i) => (
             <div key={i} style={{
@@ -152,7 +153,7 @@ export const DateInput: React.FC<DateInputProps> = ({
           ))}
         </div>
 
-        {/* 日付 */}
+        {/* Days */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 1 }}>
           {days.map((day, i) => {
             if (day === null) {
@@ -184,7 +185,7 @@ export const DateInput: React.FC<DateInputProps> = ({
           })}
         </div>
 
-        {/* 今日ボタン */}
+        {/* Today button */}
         <button
           onClick={() => handleDateSelect(new Date())}
           style={{
@@ -199,7 +200,7 @@ export const DateInput: React.FC<DateInputProps> = ({
             cursor: 'pointer',
           }}
         >
-          今日
+          {BTN_TODAY}
         </button>
       </div>
     );
@@ -207,7 +208,7 @@ export const DateInput: React.FC<DateInputProps> = ({
 
   const inputHeight = compact ? 24 : 28;
   const inputPadding = compact ? '0 6px' : '0 8px';
-  const inputFontSize = 11; // 統一
+  const inputFontSize = 11; // Unified
   const buttonPadding = compact ? '0 6px' : '0 6px';
 
   const handleInputClick = () => {

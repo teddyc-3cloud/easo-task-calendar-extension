@@ -1,5 +1,6 @@
 import { Task, validateTask, ValidationError } from '../entities/Task';
 import { TaskCalendar, updateTask, getTaskById } from '../entities/TaskCalendar';
+import { ERROR_TASK_NOT_FOUND } from '../../constants/strings';
 
 export interface EditTaskInput {
   taskId: string;
@@ -25,7 +26,7 @@ export class EditTaskUseCase {
   execute(calendar: TaskCalendar, input: EditTaskInput): EditTaskOutput {
     const existingTask = getTaskById(calendar, input.taskId);
     if (!existingTask) {
-      return { success: false, calendar, task: null, errors: [{ field: 'taskId', message: 'タスクが見つかりません' }] };
+      return { success: false, calendar, task: null, errors: [{ field: 'taskId', message: ERROR_TASK_NOT_FOUND }] };
     }
 
     const updates: Partial<Task> = {};

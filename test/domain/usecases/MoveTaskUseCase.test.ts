@@ -27,7 +27,7 @@ describe('MoveTaskUseCase', () => {
         targetEndDate: targetDate,
       });
       assert.strictEqual(result.success, true);
-      // statusは変更されない（waitingのまま）
+      // status is not changed (remains waiting)
       assert.strictEqual(result.task?.status, 'waiting');
       assert.deepStrictEqual(result.task?.startDate, targetDate);
       assert.deepStrictEqual(result.task?.endDate, targetDate);

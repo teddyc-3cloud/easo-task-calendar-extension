@@ -17,30 +17,30 @@ export class SortTasksUseCase {
     const { sortMode } = input;
 
     if (sortMode === 'manual') {
-      // 手動順: orderフィールドでソート
+      // Manual order: sort by order field
       const sortedTasks = [...calendar.tasks].sort((a, b) => a.order - b.order);
       return { sortedTasks, sortMode };
     }
 
-    // 締切順ソート
+    // Deadline order sort
     const sortedTasks = [...calendar.tasks].sort((a, b) => {
       const dateA = this.getSortDate(a);
       const dateB = this.getSortDate(b);
 
-      // 両方nullの場合はorder順を維持
+      // Both null: maintain order
       if (dateA === null && dateB === null) {
         return a.order - b.order;
       }
 
-      // nullは後ろに
+      // Null values go to the end
       if (dateA === null) return 1;
       if (dateB === null) return -1;
 
-      // 日付で比較
+      // Compare by date
       const timeDiff = dateA.getTime() - dateB.getTime();
       if (timeDiff !== 0) return timeDiff;
 
-      // 同じ日付の場合はorder順を維持
+      // Same date: maintain order
       return a.order - b.order;
     });
 
@@ -48,25 +48,25 @@ export class SortTasksUseCase {
   }
 
   /**
-   * ソート用の日付を取得
-   * 優先順位:
-   * 1. 未完了の締切がある → その中で最も近い締切日
-   * 2. 締切がないまたは全て完了 → タスクの終了日
-   * 3. 終了日もない → タスクの作成日
+   * Gets the date for sorting.
+   * Priority order:
+   * 1. Has incomplete deadlines → nearest deadline date
+   * 2. No deadlines or all completed → task end date
+   * 3. No end date → task creation date
    */
   private getSortDate(task: Task): Date | null {
-    // 1. 未完了の締切がある場合、最も近い締切日を返す
+    // 1. If there are incomplete deadlines, return the nearest one
     const nextDeadline = getNextDeadline(task);
     if (nextDeadline?.date) {
       return nextDeadline.date;
     }
 
-    // 2. タスクの終了日
+    // 2. Task end date
     if (task.endDate) {
       return task.endDate;
     }
 
-    // 3. タスクの作成日
+    // 3. Task creation date
     return task.createdAt;
   }
 }

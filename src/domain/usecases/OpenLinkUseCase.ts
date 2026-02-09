@@ -1,5 +1,6 @@
 import { Task } from '../entities/Task';
 import { TaskCalendar, getTaskById } from '../entities/TaskCalendar';
+import { ERROR_TASK_NOT_FOUND, ERROR_LINK_NOT_SET, ERROR_INVALID_URL } from '../../constants/strings';
 
 export interface OpenLinkInput {
   taskId: string;
@@ -19,7 +20,7 @@ export class OpenLinkUseCase {
       return {
         success: false,
         link: null,
-        error: 'タスクが見つかりません',
+        error: ERROR_TASK_NOT_FOUND,
       };
     }
 
@@ -27,16 +28,16 @@ export class OpenLinkUseCase {
       return {
         success: false,
         link: null,
-        error: 'リンクが設定されていません',
+        error: ERROR_LINK_NOT_SET,
       };
     }
 
-    // 簡易的なURL検証
+    // Basic URL validation
     if (!this.isValidUrl(task.link)) {
       return {
         success: false,
         link: task.link,
-        error: '無効なURL形式です',
+        error: ERROR_INVALID_URL,
       };
     }
 

@@ -14,7 +14,7 @@ describe('AddTaskUseCase', () => {
       const calendar = createTaskCalendar();
       const result = useCase.execute(calendar);
       assert.strictEqual(result.calendar.tasks.length, 1);
-      assert.strictEqual(result.newTask.title, '新しいタスク');
+      assert.strictEqual(result.newTask.title, 'New Task');
       assert.strictEqual(result.newTask.status, 'waiting');
       assert.strictEqual(result.newTask.memo, '');
       assert.strictEqual(result.newTask.link, '');
@@ -22,18 +22,18 @@ describe('AddTaskUseCase', () => {
 
     it('should add a new task with custom title', () => {
       const calendar = createTaskCalendar();
-      const result = useCase.execute(calendar, { title: 'カスタムタスク' });
-      assert.strictEqual(result.newTask.title, 'カスタムタスク');
+      const result = useCase.execute(calendar, { title: 'Custom Task' });
+      assert.strictEqual(result.newTask.title, 'Custom Task');
     });
 
     it('should add a new task with custom memo and link', () => {
       const calendar = createTaskCalendar();
       const result = useCase.execute(calendar, {
-        title: 'テストタスク',
-        memo: 'これはメモです',
+        title: 'Test Task',
+        memo: 'This is a memo',
         link: 'https://example.com',
       });
-      assert.strictEqual(result.newTask.memo, 'これはメモです');
+      assert.strictEqual(result.newTask.memo, 'This is a memo');
       assert.strictEqual(result.newTask.link, 'https://example.com');
     });
 

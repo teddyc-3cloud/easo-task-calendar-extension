@@ -16,7 +16,7 @@ export class FilterTasksUseCase {
     const { query } = input;
     const totalCount = calendar.tasks.length;
 
-    // 空のクエリは全タスクを返す
+    // Empty query returns all tasks
     if (!query || query.trim() === '' || query === '*') {
       return {
         filteredTasks: calendar.tasks,
@@ -36,44 +36,44 @@ export class FilterTasksUseCase {
   }
 
   /**
-   * ワイルドカード(*)を含むクエリを正規表現パターンに変換
-   * ワイルドカードがない場合は部分一致として扱う
+   * Converts a query containing wildcards (*) into a regex pattern.
+   * If no wildcards are present, treats the query as a partial match.
    */
   private buildPattern(query: string): RegExp {
     const trimmedQuery = query.trim().toLowerCase();
     
-    // ワイルドカードが含まれているかチェック
+    // Check if wildcard is included
     const hasWildcard = trimmedQuery.includes('*');
     
     if (hasWildcard) {
-      // ワイルドカードモード: * を .* に変換
-      // 特殊文字をエスケープしてから * を .* に置換
+      // Wildcard mode: convert * to .*
+      // Escape special characters then replace * with .*
       const escaped = trimmedQuery
-        .replace(/[.+?^${}()|[\]\\]/g, '\\$&') // 特殊文字をエスケープ（*以外）
-        .replace(/\*/g, '.*'); // * を .* に変換
+        .replace(/[.+?^${}()|[\]\\]/g, '\\$&') // Escape special chars (except *)
+        .replace(/\*/g, '.*'); // Convert * to .*
       return new RegExp(`^${escaped}$`, 'i');
     } else {
-      // 部分一致モード
+      // Partial match mode
       const escaped = trimmedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       return new RegExp(escaped, 'i');
     }
   }
 
   /**
-   * タスクがパターンにマッチするかチェック
+   * Checks if a task matches the pattern
    */
   private matchesTask(task: Task, pattern: RegExp): boolean {
-    // タイトルをチェック
+    // Check title
     if (pattern.test(task.title)) {
       return true;
     }
 
-    // メモをチェック
+    // Check memo
     if (task.memo && pattern.test(task.memo)) {
       return true;
     }
 
-    // 締切タイトルをチェック
+    // Check deadline titles
     for (const deadline of task.deadlines) {
       if (pattern.test(deadline.title)) {
         return true;

@@ -18,9 +18,9 @@ describe('ReorderTaskUseCase', () => {
   describe('execute', () => {
     it('should reorder task within same status section', () => {
       let calendar = createTaskCalendar();
-      const { calendar: cal1, newTask: task1 } = addUseCase.execute(calendar, { title: 'タスク1' });
-      const { calendar: cal2, newTask: task2 } = addUseCase.execute(cal1, { title: 'タスク2' });
-      const { calendar: cal3, newTask: task3 } = addUseCase.execute(cal2, { title: 'タスク3' });
+      const { calendar: cal1, newTask: task1 } = addUseCase.execute(calendar, { title: 'Task 1' });
+      const { calendar: cal2, newTask: task2 } = addUseCase.execute(cal1, { title: 'Task 2' });
+      const { calendar: cal3, newTask: task3 } = addUseCase.execute(cal2, { title: 'Task 3' });
       
       const result = reorderUseCase.execute(cal3, {
         taskId: task3.id,
@@ -38,7 +38,7 @@ describe('ReorderTaskUseCase', () => {
         newIndex: 0,
       });
       assert.strictEqual(result.success, false);
-      assert.strictEqual(result.error, 'タスクが見つかりません');
+      assert.strictEqual(result.error, 'Task not found');
     });
 
     it('should fail with negative index', () => {
@@ -49,27 +49,27 @@ describe('ReorderTaskUseCase', () => {
         newIndex: -1,
       });
       assert.strictEqual(result.success, false);
-      assert.ok(result.error?.includes('0以上'));
+      assert.ok(result.error?.includes('must be 0 or greater'));
     });
 
     it('should maintain order within different status sections', () => {
       let calendar = createTaskCalendar();
-      const { calendar: cal1, newTask: task1 } = addUseCase.execute(calendar, { title: 'タスク1' });
-      const { calendar: cal2, newTask: task2 } = addUseCase.execute(cal1, { title: 'タスク2' });
+      const { calendar: cal1, newTask: task1 } = addUseCase.execute(calendar, { title: 'Task 1' });
+      const { calendar: cal2, newTask: task2 } = addUseCase.execute(cal1, { title: 'Task 2' });
       
-      // task1をwaitingに変更
+      // Change task1 to waiting status
       const { calendar: cal3 } = editUseCase.execute(cal2, {
         taskId: task1.id,
         status: 'waiting',
       });
       
-      // task2をin-progressに変更
+      // Change task2 to in-progress status
       const { calendar: cal4 } = editUseCase.execute(cal3, {
         taskId: task2.id,
         status: 'in-progress',
       });
       
-      // task1の順番を変更（同じステータス内には他のタスクがない）
+      // Reorder task1 (no other tasks in same status)
       const result = reorderUseCase.execute(cal4, {
         taskId: task1.id,
         newIndex: 0,
@@ -85,7 +85,7 @@ describe('ReorderTaskUseCase', () => {
       const { calendar: cal3, newTask: task3 } = addUseCase.execute(cal2, { title: '3' });
       const { calendar: cal4, newTask: task4 } = addUseCase.execute(cal3, { title: '4' });
       
-      // task4を先頭に
+      // Move task4 to first position
       const result = reorderUseCase.execute(cal4, {
         taskId: task4.id,
         newIndex: 0,

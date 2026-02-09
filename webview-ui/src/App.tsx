@@ -27,14 +27,14 @@ export const App: React.FC = () => {
   const [collapsedSections, setCollapsedSections] = useState<Set<TaskStatus>>(new Set());
   const [verticalScrollTop, setVerticalScrollTop] = useState(0);
   
-  // VSCodeのテーマ設定を初期値として使用
+  // Use VS Code theme setting as initial value
   const getInitialTheme = (): ThemeMode => {
     const vscodeTheme = document.body.dataset.vscodeTheme;
     return vscodeTheme === 'light' ? 'light' : 'dark';
   };
   const [themeMode, setThemeMode] = useState<ThemeMode>(getInitialTheme);
   
-  // themeModeが変わったらbodyのdata-vscode-theme属性とクラスを更新（スクロールバー等のCSS変数に反映）
+  // When themeMode changes, update body's data-vscode-theme attribute and class (reflect in CSS variables for scrollbar, etc.)
   useEffect(() => {
     document.body.dataset.vscodeTheme = themeMode;
     if (themeMode === 'light') {
@@ -62,8 +62,8 @@ export const App: React.FC = () => {
           const newTask = message.payload.task;
           setCalendar(newCalendar);
           setSelectedTaskId(newTask.id);
-          // 新規タスクが見えるようにスクロール位置を調整
-          // 待機中セクションに追加されるので、実施中セクションの高さ分スクロール
+          // Adjust scroll position to show new task
+          // Scroll by height of in-progress section since task is added to waiting section
           const SECTION_HEADER_HEIGHT = 28;
           const ROW_HEIGHT = 40;
           const inProgressCount = newCalendar.tasks.filter((t: Task) => t.status === 'in-progress').length;
@@ -93,7 +93,7 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('message', handleMessage);
   }, [postMessage]);
 
-  // フィルタリングとソートを適用
+  // Apply filtering and sorting
   const processedTasks = useMemo(() => {
     const filtered = filterTasks(calendar.tasks, filterQuery);
     return sortTasks(filtered, sortMode);
@@ -108,7 +108,7 @@ export const App: React.FC = () => {
   }, [postMessage]);
 
   const handleSelectTask = useCallback((taskId: string) => {
-    // 同じタスクをクリックしたら詳細画面を閉じる
+    // Close detail panel if same task is clicked
     setSelectedTaskId(prev => prev === taskId ? null : taskId);
   }, []);
 
@@ -136,11 +136,11 @@ export const App: React.FC = () => {
     }
   }, [selectedTaskId, postMessage]);
 
-  // Deleteキーでタスク削除
+  // Delete task with Delete key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.key === 'Delete' || e.key === 'Backspace') && selectedTaskId) {
-        // input/textareaにフォーカスがある場合は無視
+        // Ignore if input/textarea has focus
         const activeElement = document.activeElement;
         if (activeElement?.tagName === 'INPUT' || activeElement?.tagName === 'TEXTAREA' || activeElement?.tagName === 'SELECT') {
           return;
@@ -154,7 +154,7 @@ export const App: React.FC = () => {
   }, [selectedTaskId, postMessage]);
 
   const handleTaskDragStart = useCallback((_taskId: string, _status: TaskStatus) => {
-    // ドラッグ開始
+    // Drag started
   }, []);
 
   const handleTaskDropToStatus = useCallback((taskId: string, targetStatus: TaskStatus, _targetIndex: number) => {
@@ -167,7 +167,7 @@ export const App: React.FC = () => {
     console.log('App: found task:', task);
     if (!task) return;
 
-    // 日付が未設定の場合は日付を設定
+    // Set dates if not set
     if (!task.startDate || !task.endDate) {
       console.log('App: setting dates for task');
       postMessage({
@@ -180,7 +180,7 @@ export const App: React.FC = () => {
         },
       });
     } else {
-      // 日付が設定済みの場合は移動
+      // Move if dates are already set
       const daysDiff = Math.round((date.getTime() - new Date(task.startDate).getTime()) / (24 * 60 * 60 * 1000));
       console.log('App: shifting dates by', daysDiff);
       if (daysDiff !== 0) {
@@ -251,12 +251,12 @@ export const App: React.FC = () => {
   const handleTaskDoubleClick = useCallback((taskId: string) => {
     const task = calendar.tasks.find(t => t.id === taskId);
     if (task?.link && task.link.trim()) {
-      // VSCode APIを通じてリンクを開く
+      // Open link through VS Code API
       postMessage({ type: 'openLink', payload: { url: task.link } });
     }
   }, [calendar.tasks, postMessage]);
 
-  // 今日へスクロールするためのトリガー
+  // Trigger for scrolling to today
   const [scrollToTodayTrigger, setScrollToTodayTrigger] = useState(0);
   const handleScrollToToday = useCallback(() => {
     setScrollToTodayTrigger(prev => prev + 1);

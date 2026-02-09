@@ -1,5 +1,12 @@
 import { Task, TaskStatus, moveTaskDates, validateTask, ValidationError } from '../entities/Task';
 import { TaskCalendar, updateTask, moveTaskToStatus, getTaskById } from '../entities/TaskCalendar';
+import {
+  ERROR_TASK_NOT_FOUND,
+  ERROR_START_DATE_REQUIRED,
+  ERROR_STATUS_REQUIRED,
+  ERROR_DAYS_DELTA_REQUIRED,
+  ERROR_INVALID_MOVE_TYPE,
+} from '../../constants/strings';
 
 export type MoveType = 'to-calendar' | 'change-status' | 'change-dates' | 'shift-dates';
 
@@ -23,7 +30,7 @@ export class MoveTaskUseCase {
   execute(calendar: TaskCalendar, input: MoveTaskInput): MoveTaskOutput {
     const existingTask = getTaskById(calendar, input.taskId);
     if (!existingTask) {
-      return { success: false, calendar, task: null, errors: [{ field: 'taskId', message: 'タスクが見つかりません' }] };
+      return { success: false, calendar, task: null, errors: [{ field: 'taskId', message: ERROR_TASK_NOT_FOUND }] };
     }
 
     let updatedCalendar: TaskCalendar;
@@ -32,9 +39,9 @@ export class MoveTaskUseCase {
     switch (input.moveType) {
       case 'to-calendar': {
         if (!input.targetStartDate) {
-          return { success: false, calendar, task: existingTask, errors: [{ field: 'targetStartDate', message: '開始日は必須です' }] };
+          return { success: false, calendar, task: existingTask, errors: [{ field: 'targetStartDate', message: ERROR_START_DATE_REQUIRED }] };
         }
-        // 日付だけ設定し、statusは変更しない（undefinedの場合のみin-progressに）
+        // Only set dates, don't change status (only change to in-progress if undefined)
         const newStatus = existingTask.status === 'undefined' ? 'in-progress' : existingTask.status;
         updatedCalendar = moveTaskToStatus(calendar, input.taskId, newStatus, {
           startDate: input.targetStartDate,
@@ -45,7 +52,7 @@ export class MoveTaskUseCase {
       }
       case 'change-status': {
         if (!input.targetStatus) {
-          return { success: false, calendar, task: existingTask, errors: [{ field: 'targetStatus', message: 'ステータスは必須です' }] };
+          return { success: false, calendar, task: existingTask, errors: [{ field: 'targetStatus', message: ERROR_STATUS_REQUIRED }] };
         }
         updatedCalendar = moveTaskToStatus(calendar, input.taskId, input.targetStatus);
         updatedTask = getTaskById(updatedCalendar, input.taskId)!;
@@ -66,7 +73,7 @@ export class MoveTaskUseCase {
       }
       case 'shift-dates': {
         if (input.daysDelta === undefined) {
-          return { success: false, calendar, task: existingTask, errors: [{ field: 'daysDelta', message: '移動日数は必須です' }] };
+          return { success: false, calendar, task: existingTask, errors: [{ field: 'daysDelta', message: ERROR_DAYS_DELTA_REQUIRED }] };
         }
         const shiftedTask = moveTaskDates(existingTask, input.daysDelta);
         updatedCalendar = updateTask(calendar, input.taskId, {
@@ -78,7 +85,7 @@ export class MoveTaskUseCase {
         break;
       }
       default:
-        return { success: false, calendar, task: existingTask, errors: [{ field: 'moveType', message: '不正な移動タイプです' }] };
+        return { success: false, calendar, task: existingTask, errors: [{ field: 'moveType', message: ERROR_INVALID_MOVE_TYPE }] };
     }
     return { success: true, calendar: updatedCalendar, task: updatedTask, errors: [] };
   }

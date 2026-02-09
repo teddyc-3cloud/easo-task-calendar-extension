@@ -20,7 +20,7 @@ export class ResizeTaskUseCase {
   execute(calendar: TaskCalendar, input: ResizeTaskInput): ResizeTaskOutput {
     const existingTask = getTaskById(calendar, input.taskId);
     if (!existingTask) {
-      return { success: false, calendar, task: null, errors: [{ field: 'taskId', message: 'タスクが見つかりません' }] };
+      return { success: false, calendar, task: null, errors: [{ field: 'taskId', message: 'Task not found' }] };
     }
 
     const tempTask = input.edge === 'start' 

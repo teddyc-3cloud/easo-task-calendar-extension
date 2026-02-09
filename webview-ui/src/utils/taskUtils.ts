@@ -1,7 +1,7 @@
 import { Task, SortMode } from '../types';
 
 /**
- * ワイルドカード(*)を含むクエリを正規表現パターンに変換
+ * Convert query with wildcard (*) to regex pattern
  */
 function buildPattern(query: string): RegExp {
   const trimmedQuery = query.trim().toLowerCase();
@@ -19,7 +19,7 @@ function buildPattern(query: string): RegExp {
 }
 
 /**
- * タスクがパターンにマッチするかチェック
+ * Check if task matches pattern
  */
 function matchesTask(task: Task, pattern: RegExp): boolean {
   if (pattern.test(task.title)) return true;
@@ -31,7 +31,7 @@ function matchesTask(task: Task, pattern: RegExp): boolean {
 }
 
 /**
- * タスクをフィルタリング
+ * Filter tasks
  */
 export function filterTasks(tasks: Task[], query: string): Task[] {
   if (!query || query.trim() === '' || query === '*') {
@@ -42,7 +42,7 @@ export function filterTasks(tasks: Task[], query: string): Task[] {
 }
 
 /**
- * 次の未完了締切を取得
+ * Get next incomplete deadline
  */
 function getNextDeadline(task: Task): { date: string | null } | null {
   const uncompleted = task.deadlines
@@ -52,7 +52,7 @@ function getNextDeadline(task: Task): { date: string | null } | null {
 }
 
 /**
- * ソート用の日付を取得
+ * Get date for sorting
  */
 function getSortDate(task: Task): Date | null {
   const nextDeadline = getNextDeadline(task);
@@ -66,10 +66,10 @@ function getSortDate(task: Task): Date | null {
 }
 
 /**
- * タスクをソート（ステータス内でソート）
+ * Sort tasks (sort within status)
  */
 export function sortTasks(tasks: Task[], sortMode: SortMode): Task[] {
-  // ステータス別にグループ化
+  // Group by status
   const byStatus = {
     'in-progress': tasks.filter(t => t.status === 'in-progress'),
     'waiting': tasks.filter(t => t.status === 'waiting'),
@@ -77,13 +77,13 @@ export function sortTasks(tasks: Task[], sortMode: SortMode): Task[] {
     'undefined': tasks.filter(t => t.status === 'undefined'),
   };
 
-  // 各ステータス内でソート
+  // Sort within each status
   const sortGroup = (group: Task[]) => {
     if (sortMode === 'manual') {
       return [...group].sort((a, b) => a.order - b.order);
     }
 
-    // 締切順ソート
+    // Sort by deadline
     return [...group].sort((a, b) => {
       const dateA = getSortDate(a);
       const dateB = getSortDate(b);

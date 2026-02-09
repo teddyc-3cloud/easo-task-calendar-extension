@@ -3,6 +3,16 @@ import { Task, TaskStatus, TaskColor, SortMode } from '../types';
 import { ThemeColors } from '../theme';
 import { formatDate } from '../utils/dateUtils';
 import { CircleDot, CheckCircle2, Clock, Play, Link, ChevronDown, ChevronRight, Search, X, ArrowUpDown } from 'lucide-react';
+import {
+  STATUS_IN_PROGRESS,
+  STATUS_WAITING,
+  STATUS_COMPLETED,
+  PLACEHOLDER_FILTER,
+  MSG_DATE_NOT_SET,
+  MSG_DRAG_TO_ADD,
+  BTN_MANUAL,
+  BTN_DEADLINE,
+} from '../constants/strings';
 
 interface TaskListProps {
   tasks: Task[];
@@ -30,7 +40,7 @@ const ROW_HEIGHT = 40;
 const SECTION_HEADER_HEIGHT = 29;
 const MONTH_ROW_HEIGHT = 20;
 const DATE_ROW_HEIGHT = 32;
-const HEADER_HEIGHT = MONTH_ROW_HEIGHT + DATE_ROW_HEIGHT; // タイムラインのヘッダーと同期
+const HEADER_HEIGHT = MONTH_ROW_HEIGHT + DATE_ROW_HEIGHT; // Sync with timeline header
 
 export const TaskList: React.FC<TaskListProps> = ({
   tasks,
@@ -57,22 +67,22 @@ export const TaskList: React.FC<TaskListProps> = ({
   const draggedTaskRef = useRef<{ id: string; status: TaskStatus } | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const lastScrollTopRef = useRef(0);
-  const isExternalScrollRef = useRef(false); // 外部からのスクロール中フラグ
+  const isExternalScrollRef = useRef(false); // Flag for external scroll sync
   const isFiltered = filterQuery.trim() !== '';
   
-  // テーマに応じたセクション設定
+  // Theme-based section configuration
   const STATUS_SECTIONS = [
-    { status: 'in-progress' as TaskStatus, label: '実行中', Icon: Play, color: theme.statusInProgress, bgColor: theme.sectionInProgress },
-    { status: 'waiting' as TaskStatus, label: '待機中', Icon: Clock, color: theme.statusWaiting, bgColor: theme.sectionWaiting },
-    { status: 'completed' as TaskStatus, label: '完了', Icon: CheckCircle2, color: theme.statusCompleted, bgColor: theme.sectionCompleted },
+    { status: 'in-progress' as TaskStatus, label: STATUS_IN_PROGRESS, Icon: Play, color: theme.statusInProgress, bgColor: theme.sectionInProgress },
+    { status: 'waiting' as TaskStatus, label: STATUS_WAITING, Icon: Clock, color: theme.statusWaiting, bgColor: theme.sectionWaiting },
+    { status: 'completed' as TaskStatus, label: STATUS_COMPLETED, Icon: CheckCircle2, color: theme.statusCompleted, bgColor: theme.sectionCompleted },
   ];
 
-  // 外部からのスクロール同期
+  // External scroll synchronization
   React.useEffect(() => {
     if (scrollContainerRef.current && Math.abs(scrollContainerRef.current.scrollTop - verticalScrollTop) > 1) {
       isExternalScrollRef.current = true;
       scrollContainerRef.current.scrollTop = verticalScrollTop;
-      // フラグをリセット
+      // Reset flag
       requestAnimationFrame(() => {
         isExternalScrollRef.current = false;
       });
@@ -80,11 +90,11 @@ export const TaskList: React.FC<TaskListProps> = ({
   }, [verticalScrollTop]);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    // 外部からのスクロールの場合は通知しない
+    // Don't notify if scroll is from external source
     if (isExternalScrollRef.current) return;
     
     const newScrollTop = e.currentTarget.scrollTop;
-    // 変化があった場合のみ通知
+    // Only notify if there's a change
     if (Math.abs(newScrollTop - lastScrollTopRef.current) > 1) {
       lastScrollTopRef.current = newScrollTop;
       onVerticalScroll(newScrollTop);
@@ -92,12 +102,12 @@ export const TaskList: React.FC<TaskListProps> = ({
   };
 
   const getTasksByStatus = (status: TaskStatus) =>
-    tasks.filter(t => t.status === status); // processedTasksはすでにソート済み
+    tasks.filter(t => t.status === status); // processedTasks are already sorted
 
   const handleDragStart = (e: React.DragEvent, task: Task) => {
     console.log('TaskList: dragStart', task.id);
     e.dataTransfer.setData('taskId', task.id);
-    e.dataTransfer.setData('text/plain', task.id); // フォールバック
+    e.dataTransfer.setData('text/plain', task.id); // Fallback
     e.dataTransfer.effectAllowed = 'move';
     draggedTaskRef.current = { id: task.id, status: task.status };
     onTaskDragStart(task.id, task.status);
@@ -133,7 +143,7 @@ export const TaskList: React.FC<TaskListProps> = ({
         onDragOver={e => {
           e.preventDefault();
           e.dataTransfer.dropEffect = 'move';
-          // マウスのY座標で上半分か下半分かを判定
+          // Determine if mouse is in top or bottom half by Y coordinate
           const rect = e.currentTarget.getBoundingClientRect();
           const midY = rect.top + rect.height / 2;
           const insertIndex = e.clientY < midY ? index : index + 1;
@@ -160,7 +170,7 @@ export const TaskList: React.FC<TaskListProps> = ({
           position: 'relative',
         }}
       >
-        {/* 上部ドロップインジケーター */}
+        {/* Top drop indicator */}
         {dragOverIndex?.status === status && dragOverIndex?.index === index && (
           <div style={{
             position: 'absolute',
@@ -206,7 +216,7 @@ export const TaskList: React.FC<TaskListProps> = ({
               {hasLink && <Link size={9} color={isSelected ? theme.textSelected : theme.accent} />}
             </div>
             <div style={{ fontSize: 9, color: isSelected ? 'rgba(255,255,255,0.7)' : theme.textMuted, marginTop: 1 }}>
-              {task.startDate && task.endDate ? `${formatDate(task.startDate)} - ${formatDate(task.endDate)}` : '日付未設定'}
+              {task.startDate && task.endDate ? `${formatDate(task.startDate)} - ${formatDate(task.endDate)}` : MSG_DATE_NOT_SET}
             </div>
           </div>
           {uncompletedDeadlines > 0 && (
@@ -226,7 +236,7 @@ export const TaskList: React.FC<TaskListProps> = ({
             </div>
           )}
         </div>
-        {/* 下部ドロップインジケーター（最後の要素の場合） */}
+        {/* Bottom drop indicator (for last element) */}
         {dragOverIndex?.status === status && dragOverIndex?.index === index + 1 && (
           <div style={{
             position: 'absolute',
@@ -274,16 +284,16 @@ export const TaskList: React.FC<TaskListProps> = ({
           borderBottom: `1px solid ${theme.border}`,
         }}
       >
-        ドラッグして追加
+        {MSG_DRAG_TO_ADD}
       </div>
     );
   };
 
   return (
     <div style={{ width: 280, backgroundColor: theme.bgSecondary, borderRight: `1px solid ${theme.border}`, flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
-      {/* タイムラインのヘッダーと同じ高さのスペーサー（固定） */}
+      {/* Fixed spacer matching timeline header height */}
       <div style={{ height: HEADER_HEIGHT, backgroundColor: theme.bgTertiary, borderBottom: `1px solid ${theme.border}`, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 8px', flexShrink: 0, gap: 4 }}>
-        {/* フィルター */}
+        {/* Filter */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <div style={{ position: 'relative', flex: 1 }}>
             <Search size={10} color={theme.textMuted} style={{ position: 'absolute', left: 6, top: '50%', transform: 'translateY(-50%)' }} />
@@ -291,7 +301,7 @@ export const TaskList: React.FC<TaskListProps> = ({
               type="text"
               value={filterQuery}
               onChange={e => onFilterChange(e.target.value)}
-              placeholder="フィルター"
+              placeholder={PLACEHOLDER_FILTER}
               style={{
                 width: '100%',
                 padding: '3px 22px 3px 22px',
@@ -329,7 +339,7 @@ export const TaskList: React.FC<TaskListProps> = ({
             </span>
           )}
         </div>
-        {/* ソート切替ボタン */}
+        {/* Sort toggle buttons */}
         <div style={{ 
           display: 'inline-flex', 
           borderRadius: 3, 
@@ -352,10 +362,10 @@ export const TaskList: React.FC<TaskListProps> = ({
               gap: 2,
               margin: 0,
             }}
-            title="手動順"
+            title="Manual order"
           >
             <ArrowUpDown size={9} />
-            手動
+            {BTN_MANUAL}
           </button>
           <button
             onClick={() => onSortChange('deadline')}
@@ -372,14 +382,14 @@ export const TaskList: React.FC<TaskListProps> = ({
               gap: 2,
               margin: 0,
             }}
-            title="締切順"
+            title="Deadline order"
           >
             <Clock size={9} />
-            締切
+            {BTN_DEADLINE}
           </button>
         </div>
       </div>
-      {/* スクロール可能なボディ */}
+      {/* Scrollable body */}
       <div 
         ref={scrollContainerRef}
         onScroll={handleScroll}

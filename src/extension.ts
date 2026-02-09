@@ -8,8 +8,8 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand('taskCalendar.open', async () => {
       const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-      if (!workspaceFolder) { vscode.window.showErrorMessage('ワークスペースを開いてください'); return; }
-      const fileName = await vscode.window.showInputBox({ prompt: 'タスクカレンダーファイル名を入力', value: 'tasks.tcal', validateInput: (v) => v.endsWith('.tcal') ? null : '.tcal で終わる必要があります' });
+      if (!workspaceFolder) { vscode.window.showErrorMessage('Please open a workspace'); return; }
+      const fileName = await vscode.window.showInputBox({ prompt: 'Enter task calendar file name', value: 'tasks.tcal', validateInput: (v) => v.endsWith('.tcal') ? null : 'Must end with .tcal' });
       if (!fileName) return;
       const fileUri = vscode.Uri.joinPath(workspaceFolder.uri, fileName);
       try {

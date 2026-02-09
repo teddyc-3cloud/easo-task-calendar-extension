@@ -15,10 +15,10 @@ export interface AddTaskOutput {
 export class AddTaskUseCase {
   execute(calendar: TaskCalendar, input: AddTaskInput = {}): AddTaskOutput {
     const taskPartial = createTask({
-      title: input.title ?? '新しいタスク',
+      title: input.title ?? 'New Task',
       memo: input.memo ?? '',
       link: input.link ?? '',
-      status: 'waiting', // 新規タスクは待機中として作成
+      status: 'waiting', // New tasks are created as waiting
     });
     const updatedCalendar = addTask(calendar, taskPartial);
     const newTask = updatedCalendar.tasks[updatedCalendar.tasks.length - 1];

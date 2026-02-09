@@ -19,13 +19,13 @@ describe('ManageDeadlineUseCase', () => {
       const result = deadlineUseCase.execute(calWithTask, {
         taskId: newTask.id,
         action: 'add',
-        title: 'ドラフト完成',
+        title: 'Draft Complete',
         date: new Date('2026-02-06'),
       });
       assert.strictEqual(result.success, true);
       assert.strictEqual(result.task?.deadlines.length, 1);
-      assert.strictEqual(result.task?.deadlines[0].title, 'ドラフト完成');
-      assert.strictEqual(result.deadline?.title, 'ドラフト完成');
+      assert.strictEqual(result.task?.deadlines[0].title, 'Draft Complete');
+      assert.strictEqual(result.deadline?.title, 'Draft Complete');
     });
 
     it('should add deadline with default title', () => {
@@ -36,7 +36,7 @@ describe('ManageDeadlineUseCase', () => {
         action: 'add',
       });
       assert.strictEqual(result.success, true);
-      assert.strictEqual(result.task?.deadlines[0].title, '新しい締切');
+      assert.strictEqual(result.task?.deadlines[0].title, 'New Deadline');
     });
 
     it('should add deadline without date', () => {
@@ -45,7 +45,7 @@ describe('ManageDeadlineUseCase', () => {
       const result = deadlineUseCase.execute(calWithTask, {
         taskId: newTask.id,
         action: 'add',
-        title: '未定の締切',
+        title: 'TBD Deadline',
       });
       assert.strictEqual(result.success, true);
       assert.strictEqual(result.task?.deadlines[0].date, null);
@@ -57,12 +57,12 @@ describe('ManageDeadlineUseCase', () => {
       const result1 = deadlineUseCase.execute(calWithTask, {
         taskId: newTask.id,
         action: 'add',
-        title: '締切1',
+        title: 'Deadline 1',
       });
       const result2 = deadlineUseCase.execute(result1.calendar, {
         taskId: newTask.id,
         action: 'add',
-        title: '締切2',
+        title: 'Deadline 2',
       });
       assert.strictEqual(result2.task?.deadlines.length, 2);
     });
@@ -73,7 +73,7 @@ describe('ManageDeadlineUseCase', () => {
       const result = deadlineUseCase.execute(calWithTask, {
         taskId: newTask.id,
         action: 'add',
-        title: 'テスト締切',
+        title: 'Test Deadline',
       });
       assert.strictEqual(result.deadline?.completed, false);
     });
@@ -86,17 +86,17 @@ describe('ManageDeadlineUseCase', () => {
       const addResult = deadlineUseCase.execute(calWithTask, {
         taskId: newTask.id,
         action: 'add',
-        title: '元のタイトル',
+        title: 'Original Title',
       });
       const deadlineId = addResult.deadline!.id;
       const result = deadlineUseCase.execute(addResult.calendar, {
         taskId: newTask.id,
         action: 'edit',
         deadlineId,
-        title: '新しいタイトル',
+        title: 'New Title',
       });
       assert.strictEqual(result.success, true);
-      assert.strictEqual(result.task?.deadlines[0].title, '新しいタイトル');
+      assert.strictEqual(result.task?.deadlines[0].title, 'New Title');
     });
 
     it('should edit deadline date', () => {
@@ -105,7 +105,7 @@ describe('ManageDeadlineUseCase', () => {
       const addResult = deadlineUseCase.execute(calWithTask, {
         taskId: newTask.id,
         action: 'add',
-        title: 'テスト締切',
+        title: 'Test Deadline',
       });
       const deadlineId = addResult.deadline!.id;
       const newDate = new Date('2026-02-15');
@@ -125,7 +125,7 @@ describe('ManageDeadlineUseCase', () => {
       const result = deadlineUseCase.execute(calWithTask, {
         taskId: newTask.id,
         action: 'edit',
-        title: 'テスト',
+        title: 'Test',
       });
       assert.strictEqual(result.success, false);
       assert.ok(result.errors.some(e => e.field === 'deadlineId'));
@@ -138,7 +138,7 @@ describe('ManageDeadlineUseCase', () => {
         taskId: newTask.id,
         action: 'edit',
         deadlineId: 'non-existent',
-        title: 'テスト',
+        title: 'Test',
       });
       assert.strictEqual(result.success, false);
       assert.ok(result.errors.some(e => e.field === 'deadlineId'));
@@ -152,7 +152,7 @@ describe('ManageDeadlineUseCase', () => {
       const addResult = deadlineUseCase.execute(calWithTask, {
         taskId: newTask.id,
         action: 'add',
-        title: '削除する締切',
+        title: 'Deadline to Delete',
       });
       const deadlineId = addResult.deadline!.id;
       const result = deadlineUseCase.execute(addResult.calendar, {
@@ -178,9 +178,9 @@ describe('ManageDeadlineUseCase', () => {
     it('should delete only specified deadline', () => {
       const calendar = createTaskCalendar();
       const { calendar: calWithTask, newTask } = addUseCase.execute(calendar);
-      const r1 = deadlineUseCase.execute(calWithTask, { taskId: newTask.id, action: 'add', title: '締切1' });
-      const r2 = deadlineUseCase.execute(r1.calendar, { taskId: newTask.id, action: 'add', title: '締切2' });
-      const r3 = deadlineUseCase.execute(r2.calendar, { taskId: newTask.id, action: 'add', title: '締切3' });
+      const r1 = deadlineUseCase.execute(calWithTask, { taskId: newTask.id, action: 'add', title: 'Deadline 1' });
+      const r2 = deadlineUseCase.execute(r1.calendar, { taskId: newTask.id, action: 'add', title: 'Deadline 2' });
+      const r3 = deadlineUseCase.execute(r2.calendar, { taskId: newTask.id, action: 'add', title: 'Deadline 3' });
       
       const result = deadlineUseCase.execute(r3.calendar, {
         taskId: newTask.id,
@@ -190,9 +190,9 @@ describe('ManageDeadlineUseCase', () => {
       
       assert.strictEqual(result.success, true);
       assert.strictEqual(result.task?.deadlines.length, 2);
-      assert.ok(result.task?.deadlines.some(d => d.title === '締切1'));
-      assert.ok(result.task?.deadlines.some(d => d.title === '締切3'));
-      assert.ok(!result.task?.deadlines.some(d => d.title === '締切2'));
+      assert.ok(result.task?.deadlines.some(d => d.title === 'Deadline 1'));
+      assert.ok(result.task?.deadlines.some(d => d.title === 'Deadline 3'));
+      assert.ok(!result.task?.deadlines.some(d => d.title === 'Deadline 2'));
     });
   });
 
@@ -203,12 +203,12 @@ describe('ManageDeadlineUseCase', () => {
       const addResult = deadlineUseCase.execute(calWithTask, {
         taskId: newTask.id,
         action: 'add',
-        title: 'トグルテスト',
+        title: 'Toggle Test',
       });
       const deadlineId = addResult.deadline!.id;
       assert.strictEqual(addResult.deadline?.completed, false);
       
-      // 完了にする
+      // Mark as completed
       const result1 = deadlineUseCase.execute(addResult.calendar, {
         taskId: newTask.id,
         action: 'toggle',
@@ -217,7 +217,7 @@ describe('ManageDeadlineUseCase', () => {
       assert.strictEqual(result1.success, true);
       assert.strictEqual(result1.task?.deadlines[0].completed, true);
       
-      // 未完了に戻す
+      // Mark as uncompleted
       const result2 = deadlineUseCase.execute(result1.calendar, {
         taskId: newTask.id,
         action: 'toggle',

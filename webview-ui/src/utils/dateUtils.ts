@@ -1,4 +1,4 @@
-// 表示用フォーマット（yyyy/mm/dd）
+// Display format (yyyy/mm/dd)
 export function formatDate(date: Date | string | null): string {
   if (!date) return '';
   const d = typeof date === 'string' ? new Date(date) : date;
@@ -8,7 +8,7 @@ export function formatDate(date: Date | string | null): string {
   return `${year}/${month}/${day}`;
 }
 
-// input[type="date"]用のフォーマット（yyyy-mm-dd）
+// Format for input[type="date"] (yyyy-mm-dd)
 export function formatDateInput(date: Date | string | null): string {
   if (!date) return '';
   const d = typeof date === 'string' ? new Date(date) : date;
@@ -18,7 +18,7 @@ export function formatDateInput(date: Date | string | null): string {
   return `${year}-${month}-${day}`;
 }
 
-// 短い表示用フォーマット（m/d）
+// Short display format (m/d)
 export function formatDateShort(date: Date | string | null): string {
   if (!date) return '';
   const d = typeof date === 'string' ? new Date(date) : date;
@@ -26,7 +26,7 @@ export function formatDateShort(date: Date | string | null): string {
 }
 
 export function formatDateWithDay(date: Date): string {
-  const days = ['日', '月', '火', '水', '木', '金', '土'];
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   return `${date.getDate()}(${days[date.getDay()]})`;
 }
 
@@ -35,13 +35,13 @@ export function formatMonthYear(date: Date): string {
 }
 
 export function getWeekNumber(date: Date): number {
-  // ISO 8601週番号を計算
+  // Calculate ISO 8601 week number
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-  // 木曜日に設定（ISO週は木曜日がある週で決まる）
+  // Set to Thursday (ISO week is determined by the week containing Thursday)
   d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-  // 年の最初の日
+  // First day of the year
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  // 週番号を計算
+  // Calculate week number
   const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
   return weekNo;
 }

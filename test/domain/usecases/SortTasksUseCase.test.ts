@@ -21,96 +21,96 @@ describe('SortTasksUseCase', () => {
   describe('manual sort', () => {
     it('should sort by order field in manual mode', () => {
       let calendar = createTaskCalendar();
-      const { calendar: cal1 } = addUseCase.execute(calendar, { title: 'タスク1' }); // order: 1
-      const { calendar: cal2 } = addUseCase.execute(cal1, { title: 'タスク2' }); // order: 2
-      const { calendar: cal3 } = addUseCase.execute(cal2, { title: 'タスク3' }); // order: 3
+      const { calendar: cal1 } = addUseCase.execute(calendar, { title: 'Task 1' }); // order: 1
+      const { calendar: cal2 } = addUseCase.execute(cal1, { title: 'Task 2' }); // order: 2
+      const { calendar: cal3 } = addUseCase.execute(cal2, { title: 'Task 3' }); // order: 3
 
       const result = sortUseCase.execute(cal3, { sortMode: 'manual' });
 
       assert.strictEqual(result.sortMode, 'manual');
-      assert.strictEqual(result.sortedTasks[0].title, 'タスク1');
-      assert.strictEqual(result.sortedTasks[1].title, 'タスク2');
-      assert.strictEqual(result.sortedTasks[2].title, 'タスク3');
+      assert.strictEqual(result.sortedTasks[0].title, 'Task 1');
+      assert.strictEqual(result.sortedTasks[1].title, 'Task 2');
+      assert.strictEqual(result.sortedTasks[2].title, 'Task 3');
     });
   });
 
   describe('deadline sort', () => {
     it('should sort by nearest uncompleted deadline', () => {
       let calendar = createTaskCalendar();
-      const { calendar: cal1, newTask: task1 } = addUseCase.execute(calendar, { title: '遠い締切' });
-      const { calendar: cal2, newTask: task2 } = addUseCase.execute(cal1, { title: '近い締切' });
-      const { calendar: cal3, newTask: task3 } = addUseCase.execute(cal2, { title: '中間締切' });
+      const { calendar: cal1, newTask: task1 } = addUseCase.execute(calendar, { title: 'Far Deadline' });
+      const { calendar: cal2, newTask: task2 } = addUseCase.execute(cal1, { title: 'Near Deadline' });
+      const { calendar: cal3, newTask: task3 } = addUseCase.execute(cal2, { title: 'Mid Deadline' });
 
-      // 締切を追加
+      // Add deadlines
       const { calendar: cal4 } = deadlineUseCase.execute(cal3, {
         taskId: task1.id,
         action: 'add',
-        title: '締切',
+        title: 'Deadline',
         date: new Date('2026-02-20'),
       });
       const { calendar: cal5 } = deadlineUseCase.execute(cal4, {
         taskId: task2.id,
         action: 'add',
-        title: '締切',
+        title: 'Deadline',
         date: new Date('2026-02-05'),
       });
       const { calendar: cal6 } = deadlineUseCase.execute(cal5, {
         taskId: task3.id,
         action: 'add',
-        title: '締切',
+        title: 'Deadline',
         date: new Date('2026-02-10'),
       });
 
       const result = sortUseCase.execute(cal6, { sortMode: 'deadline' });
 
-      assert.strictEqual(result.sortedTasks[0].title, '近い締切');
-      assert.strictEqual(result.sortedTasks[1].title, '中間締切');
-      assert.strictEqual(result.sortedTasks[2].title, '遠い締切');
+      assert.strictEqual(result.sortedTasks[0].title, 'Near Deadline');
+      assert.strictEqual(result.sortedTasks[1].title, 'Mid Deadline');
+      assert.strictEqual(result.sortedTasks[2].title, 'Far Deadline');
     });
 
     it('should ignore completed deadlines when sorting', () => {
       let calendar = createTaskCalendar();
-      const { calendar: cal1, newTask: task1 } = addUseCase.execute(calendar, { title: 'タスクA' });
-      const { calendar: cal2, newTask: task2 } = addUseCase.execute(cal1, { title: 'タスクB' });
+      const { calendar: cal1, newTask: task1 } = addUseCase.execute(calendar, { title: 'Task A' });
+      const { calendar: cal2, newTask: task2 } = addUseCase.execute(cal1, { title: 'Task B' });
 
-      // タスクAに近い締切（完了済み）と遠い締切（未完了）を追加
+      // Add near deadline (completed) and far deadline (uncompleted) to Task A
       const { calendar: cal3, deadline: dl1 } = deadlineUseCase.execute(cal2, {
         taskId: task1.id,
         action: 'add',
-        title: '近い締切',
+        title: 'Near Deadline',
         date: new Date('2026-02-01'),
       });
       const { calendar: cal4 } = deadlineUseCase.execute(cal3, {
         taskId: task1.id,
         action: 'toggle',
         deadlineId: dl1!.id,
-      }); // 完了にする
+      }); // Mark as completed
       const { calendar: cal5 } = deadlineUseCase.execute(cal4, {
         taskId: task1.id,
         action: 'add',
-        title: '遠い締切',
+        title: 'Far Deadline',
         date: new Date('2026-02-20'),
       });
 
-      // タスクBに中間の締切を追加
+      // Add mid deadline to Task B
       const { calendar: cal6 } = deadlineUseCase.execute(cal5, {
         taskId: task2.id,
         action: 'add',
-        title: '中間締切',
+        title: 'Mid Deadline',
         date: new Date('2026-02-10'),
       });
 
       const result = sortUseCase.execute(cal6, { sortMode: 'deadline' });
 
-      // タスクBの中間締切（2/10）がタスクAの遠い締切（2/20）より前
-      assert.strictEqual(result.sortedTasks[0].title, 'タスクB');
-      assert.strictEqual(result.sortedTasks[1].title, 'タスクA');
+      // Task B's mid deadline (2/10) comes before Task A's far deadline (2/20)
+      assert.strictEqual(result.sortedTasks[0].title, 'Task B');
+      assert.strictEqual(result.sortedTasks[1].title, 'Task A');
     });
 
     it('should use end date when no uncompleted deadline', () => {
       let calendar = createTaskCalendar();
-      const { calendar: cal1, newTask: task1 } = addUseCase.execute(calendar, { title: '終了日遠い' });
-      const { calendar: cal2, newTask: task2 } = addUseCase.execute(cal1, { title: '終了日近い' });
+      const { calendar: cal1, newTask: task1 } = addUseCase.execute(calendar, { title: 'End Date Far' });
+      const { calendar: cal2, newTask: task2 } = addUseCase.execute(cal1, { title: 'End Date Near' });
 
       const { calendar: cal3 } = editUseCase.execute(cal2, {
         taskId: task1.id,
@@ -125,92 +125,92 @@ describe('SortTasksUseCase', () => {
 
       const result = sortUseCase.execute(cal4, { sortMode: 'deadline' });
 
-      assert.strictEqual(result.sortedTasks[0].title, '終了日近い');
-      assert.strictEqual(result.sortedTasks[1].title, '終了日遠い');
+      assert.strictEqual(result.sortedTasks[0].title, 'End Date Near');
+      assert.strictEqual(result.sortedTasks[1].title, 'End Date Far');
     });
 
     it('should use created date when no deadline and no end date', () => {
       let calendar = createTaskCalendar();
-      // 先に作成 = 古いcreatedAt
-      const { calendar: cal1 } = addUseCase.execute(calendar, { title: '古いタスク' });
-      // 後に作成 = 新しいcreatedAt
-      const { calendar: cal2 } = addUseCase.execute(cal1, { title: '新しいタスク' });
+      // Created first = older createdAt
+      const { calendar: cal1 } = addUseCase.execute(calendar, { title: 'Older Task' });
+      // Created later = newer createdAt
+      const { calendar: cal2 } = addUseCase.execute(cal1, { title: 'Newer Task' });
 
       const result = sortUseCase.execute(cal2, { sortMode: 'deadline' });
 
-      // createdAtが古い順（先に作成されたものが前）
-      assert.strictEqual(result.sortedTasks[0].title, '古いタスク');
-      assert.strictEqual(result.sortedTasks[1].title, '新しいタスク');
+      // Sorted by createdAt in ascending order (older first)
+      assert.strictEqual(result.sortedTasks[0].title, 'Older Task');
+      assert.strictEqual(result.sortedTasks[1].title, 'Newer Task');
     });
 
     it('should maintain order for tasks with same date', () => {
       let calendar = createTaskCalendar();
-      const { calendar: cal1, newTask: task1 } = addUseCase.execute(calendar, { title: 'タスク1' });
-      const { calendar: cal2, newTask: task2 } = addUseCase.execute(cal1, { title: 'タスク2' });
-      const { calendar: cal3, newTask: task3 } = addUseCase.execute(cal2, { title: 'タスク3' });
+      const { calendar: cal1, newTask: task1 } = addUseCase.execute(calendar, { title: 'Task 1' });
+      const { calendar: cal2, newTask: task2 } = addUseCase.execute(cal1, { title: 'Task 2' });
+      const { calendar: cal3, newTask: task3 } = addUseCase.execute(cal2, { title: 'Task 3' });
 
       const sameDate = new Date('2026-02-10');
       const { calendar: cal4 } = deadlineUseCase.execute(cal3, {
         taskId: task1.id,
         action: 'add',
-        title: '締切',
+        title: 'Deadline',
         date: sameDate,
       });
       const { calendar: cal5 } = deadlineUseCase.execute(cal4, {
         taskId: task2.id,
         action: 'add',
-        title: '締切',
+        title: 'Deadline',
         date: sameDate,
       });
       const { calendar: cal6 } = deadlineUseCase.execute(cal5, {
         taskId: task3.id,
         action: 'add',
-        title: '締切',
+        title: 'Deadline',
         date: sameDate,
       });
 
       const result = sortUseCase.execute(cal6, { sortMode: 'deadline' });
 
-      // 同じ日付の場合、元のorder順を維持
-      assert.strictEqual(result.sortedTasks[0].title, 'タスク1');
-      assert.strictEqual(result.sortedTasks[1].title, 'タスク2');
-      assert.strictEqual(result.sortedTasks[2].title, 'タスク3');
+      // When dates are same, maintain original order
+      assert.strictEqual(result.sortedTasks[0].title, 'Task 1');
+      assert.strictEqual(result.sortedTasks[1].title, 'Task 2');
+      assert.strictEqual(result.sortedTasks[2].title, 'Task 3');
     });
 
     it('should put tasks without any date at the end', () => {
       let calendar = createTaskCalendar();
-      const { calendar: cal1, newTask: task1 } = addUseCase.execute(calendar, { title: '日付なし1' });
-      const { calendar: cal2, newTask: task2 } = addUseCase.execute(cal1, { title: '締切あり' });
-      const { calendar: cal3 } = addUseCase.execute(cal2, { title: '日付なし2' });
+      const { calendar: cal1, newTask: task1 } = addUseCase.execute(calendar, { title: 'No Date 1' });
+      const { calendar: cal2, newTask: task2 } = addUseCase.execute(cal1, { title: 'Has Deadline' });
+      const { calendar: cal3 } = addUseCase.execute(cal2, { title: 'No Date 2' });
 
       const { calendar: cal4 } = deadlineUseCase.execute(cal3, {
         taskId: task2.id,
         action: 'add',
-        title: '締切',
+        title: 'Deadline',
         date: new Date('2026-02-10'),
       });
 
       const result = sortUseCase.execute(cal4, { sortMode: 'deadline' });
 
-      // 締切ありのタスクが先頭（日付なしは末尾…だが、createdAtがあるので先頭ではない）
-      // 実際にはcreatedAtでソートされるので、日付なしでもcreatedAt順になる
-      assert.ok(result.sortedTasks.some(t => t.title === '締切あり'));
+      // Task with deadline comes first (but no date tasks have createdAt so not necessarily at end)
+      // Actually sorted by createdAt when no date, so order depends on creation time
+      assert.ok(result.sortedTasks.some(t => t.title === 'Has Deadline'));
     });
 
     it('should handle mixed tasks with deadlines and end dates', () => {
       let calendar = createTaskCalendar();
-      const { calendar: cal1, newTask: task1 } = addUseCase.execute(calendar, { title: '締切タスク' });
-      const { calendar: cal2, newTask: task2 } = addUseCase.execute(cal1, { title: '終了日タスク' });
+      const { calendar: cal1, newTask: task1 } = addUseCase.execute(calendar, { title: 'Deadline Task' });
+      const { calendar: cal2, newTask: task2 } = addUseCase.execute(cal1, { title: 'End Date Task' });
 
-      // 締切: 2/15
+      // Deadline: 2/15
       const { calendar: cal3 } = deadlineUseCase.execute(cal2, {
         taskId: task1.id,
         action: 'add',
-        title: '締切',
+        title: 'Deadline',
         date: new Date('2026-02-15'),
       });
 
-      // 終了日: 2/10（締切より早い）
+      // End date: 2/10 (earlier than deadline)
       const { calendar: cal4 } = editUseCase.execute(cal3, {
         taskId: task2.id,
         startDate: new Date('2026-02-01'),
@@ -219,8 +219,8 @@ describe('SortTasksUseCase', () => {
 
       const result = sortUseCase.execute(cal4, { sortMode: 'deadline' });
 
-      assert.strictEqual(result.sortedTasks[0].title, '終了日タスク');
-      assert.strictEqual(result.sortedTasks[1].title, '締切タスク');
+      assert.strictEqual(result.sortedTasks[0].title, 'End Date Task');
+      assert.strictEqual(result.sortedTasks[1].title, 'Deadline Task');
     });
   });
 

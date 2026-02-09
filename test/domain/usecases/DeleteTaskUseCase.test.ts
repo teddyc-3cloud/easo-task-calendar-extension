@@ -16,14 +16,14 @@ describe('DeleteTaskUseCase', () => {
     it('should delete existing task', () => {
       const calendar = createTaskCalendar();
       const { calendar: calWithTask, newTask } = addUseCase.execute(calendar, {
-        title: '削除するタスク',
+        title: 'Task to Delete',
       });
       const result = deleteUseCase.execute(calWithTask, {
         taskId: newTask.id,
       });
       assert.strictEqual(result.success, true);
       assert.strictEqual(result.calendar.tasks.length, 0);
-      assert.strictEqual(result.deletedTaskTitle, '削除するタスク');
+      assert.strictEqual(result.deletedTaskTitle, 'Task to Delete');
       assert.strictEqual(result.error, null);
     });
 
@@ -34,14 +34,14 @@ describe('DeleteTaskUseCase', () => {
       });
       assert.strictEqual(result.success, false);
       assert.strictEqual(result.deletedTaskTitle, null);
-      assert.strictEqual(result.error, 'タスクが見つかりません');
+      assert.strictEqual(result.error, 'Task not found');
     });
 
     it('should delete only the specified task', () => {
       let calendar = createTaskCalendar();
-      const { calendar: cal1, newTask: task1 } = addUseCase.execute(calendar, { title: 'タスク1' });
-      const { calendar: cal2, newTask: task2 } = addUseCase.execute(cal1, { title: 'タスク2' });
-      const { calendar: cal3, newTask: task3 } = addUseCase.execute(cal2, { title: 'タスク3' });
+      const { calendar: cal1, newTask: task1 } = addUseCase.execute(calendar, { title: 'Task 1' });
+      const { calendar: cal2, newTask: task2 } = addUseCase.execute(cal1, { title: 'Task 2' });
+      const { calendar: cal3, newTask: task3 } = addUseCase.execute(cal2, { title: 'Task 3' });
       const result = deleteUseCase.execute(cal3, { taskId: task2.id });
       assert.strictEqual(result.success, true);
       assert.strictEqual(result.calendar.tasks.length, 2);
@@ -60,10 +60,10 @@ describe('DeleteTaskUseCase', () => {
 
     it('should not modify calendar on failed deletion', () => {
       const calendar = createTaskCalendar();
-      const { calendar: calWithTask } = addUseCase.execute(calendar, { title: '既存タスク' });
+      const { calendar: calWithTask } = addUseCase.execute(calendar, { title: 'Existing Task' });
       const result = deleteUseCase.execute(calWithTask, { taskId: 'non-existent' });
       assert.strictEqual(result.calendar.tasks.length, 1);
-      assert.strictEqual(result.calendar.tasks[0].title, '既存タスク');
+      assert.strictEqual(result.calendar.tasks[0].title, 'Existing Task');
     });
   });
 });

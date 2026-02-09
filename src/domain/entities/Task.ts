@@ -1,6 +1,14 @@
 /**
- * Task Entity - タスク管理のコアドメインモデル
+ * Task Entity - Core domain model for task management
  */
+
+import {
+  DEFAULT_TASK_TITLE,
+  DEFAULT_DEADLINE_TITLE,
+  ERROR_TITLE_REQUIRED,
+  ERROR_START_DATE_BEFORE_END,
+  ERROR_DEADLINE_OUTSIDE_PERIOD,
+} from '../../constants/strings';
 
 export type TaskStatus = 'undefined' | 'waiting' | 'in-progress' | 'completed';
 export type TaskPriority = 'low' | 'medium' | 'high';
@@ -36,7 +44,7 @@ function generateId(): string {
 export function createTask(partial: Partial<Task> = {}): Task {
   return {
     id: partial.id ?? generateId(),
-    title: partial.title ?? '新しいタスク',
+    title: partial.title ?? DEFAULT_TASK_TITLE,
     memo: partial.memo ?? '',
     link: partial.link ?? '',
     status: partial.status ?? 'undefined',
@@ -54,7 +62,7 @@ export function createTask(partial: Partial<Task> = {}): Task {
 export function createDeadline(partial: Partial<Deadline> = {}): Deadline {
   return {
     id: partial.id ?? generateId(),
-    title: partial.title ?? '新しい締切',
+    title: partial.title ?? DEFAULT_DEADLINE_TITLE,
     date: partial.date ?? null,
     completed: partial.completed ?? false,
   };
@@ -68,18 +76,18 @@ export interface ValidationError {
 export function validateTask(task: Task): ValidationError[] {
   const errors: ValidationError[] = [];
   if (!task.title || task.title.trim() === '') {
-    errors.push({ field: 'title', message: 'タイトルは必須です' });
+    errors.push({ field: 'title', message: ERROR_TITLE_REQUIRED });
   }
   if (task.startDate && task.endDate && task.startDate > task.endDate) {
-    errors.push({ field: 'dateRange', message: '開始日は終了日より前である必要があります' });
+    errors.push({ field: 'dateRange', message: ERROR_START_DATE_BEFORE_END });
   }
   for (const deadline of task.deadlines) {
     if (deadline.date) {
       if (task.startDate && deadline.date < task.startDate) {
-        errors.push({ field: `deadline-${deadline.id}`, message: `締切「${deadline.title}」はタスク期間内である必要があります` });
+        errors.push({ field: `deadline-${deadline.id}`, message: ERROR_DEADLINE_OUTSIDE_PERIOD(deadline.title) });
       }
       if (task.endDate && deadline.date > task.endDate) {
-        errors.push({ field: `deadline-${deadline.id}`, message: `締切「${deadline.title}」はタスク期間内である必要があります` });
+        errors.push({ field: `deadline-${deadline.id}`, message: ERROR_DEADLINE_OUTSIDE_PERIOD(deadline.title) });
       }
     }
   }

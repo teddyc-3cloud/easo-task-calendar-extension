@@ -21,9 +21,9 @@ describe('FilterTasksUseCase', () => {
   describe('basic filtering', () => {
     it('should return all tasks when query is empty', () => {
       let calendar = createTaskCalendar();
-      const { calendar: cal1 } = addUseCase.execute(calendar, { title: 'タスク1' });
-      const { calendar: cal2 } = addUseCase.execute(cal1, { title: 'タスク2' });
-      const { calendar: cal3 } = addUseCase.execute(cal2, { title: 'タスク3' });
+      const { calendar: cal1 } = addUseCase.execute(calendar, { title: 'Task 1' });
+      const { calendar: cal2 } = addUseCase.execute(cal1, { title: 'Task 2' });
+      const { calendar: cal3 } = addUseCase.execute(cal2, { title: 'Task 3' });
 
       const result = filterUseCase.execute(cal3, { query: '' });
 
@@ -33,8 +33,8 @@ describe('FilterTasksUseCase', () => {
 
     it('should return all tasks when query is only whitespace', () => {
       let calendar = createTaskCalendar();
-      const { calendar: cal1 } = addUseCase.execute(calendar, { title: 'タスク1' });
-      const { calendar: cal2 } = addUseCase.execute(cal1, { title: 'タスク2' });
+      const { calendar: cal1 } = addUseCase.execute(calendar, { title: 'Task 1' });
+      const { calendar: cal2 } = addUseCase.execute(cal1, { title: 'Task 2' });
 
       const result = filterUseCase.execute(cal2, { query: '   ' });
 
@@ -43,8 +43,8 @@ describe('FilterTasksUseCase', () => {
 
     it('should return all tasks when query is single asterisk', () => {
       let calendar = createTaskCalendar();
-      const { calendar: cal1 } = addUseCase.execute(calendar, { title: 'タスク1' });
-      const { calendar: cal2 } = addUseCase.execute(cal1, { title: 'タスク2' });
+      const { calendar: cal1 } = addUseCase.execute(calendar, { title: 'Task 1' });
+      const { calendar: cal2 } = addUseCase.execute(cal1, { title: 'Task 2' });
 
       const result = filterUseCase.execute(cal2, { query: '*' });
 
@@ -53,38 +53,38 @@ describe('FilterTasksUseCase', () => {
 
     it('should filter by title partial match', () => {
       let calendar = createTaskCalendar();
-      const { calendar: cal1 } = addUseCase.execute(calendar, { title: 'プレゼン資料作成' });
-      const { calendar: cal2 } = addUseCase.execute(cal1, { title: 'コードレビュー' });
-      const { calendar: cal3 } = addUseCase.execute(cal2, { title: 'レビュー会議' });
+      const { calendar: cal1 } = addUseCase.execute(calendar, { title: 'Presentation Materials' });
+      const { calendar: cal2 } = addUseCase.execute(cal1, { title: 'Code Review' });
+      const { calendar: cal3 } = addUseCase.execute(cal2, { title: 'Review Meeting' });
 
-      const result = filterUseCase.execute(cal3, { query: 'レビュー' });
+      const result = filterUseCase.execute(cal3, { query: 'Review' });
 
       assert.strictEqual(result.matchedCount, 2);
-      assert.ok(result.filteredTasks.every(t => t.title.includes('レビュー')));
+      assert.ok(result.filteredTasks.every(t => t.title.includes('Review')));
     });
 
     it('should filter by memo', () => {
       let calendar = createTaskCalendar();
-      const { calendar: cal1, newTask: task1 } = addUseCase.execute(calendar, { title: 'タスク1' });
-      const { calendar: cal2 } = editUseCase.execute(cal1, { taskId: task1.id, memo: '重要な作業' });
-      const { calendar: cal3 } = addUseCase.execute(cal2, { title: 'タスク2', memo: '通常作業' });
+      const { calendar: cal1, newTask: task1 } = addUseCase.execute(calendar, { title: 'Task 1' });
+      const { calendar: cal2 } = editUseCase.execute(cal1, { taskId: task1.id, memo: 'Important work' });
+      const { calendar: cal3 } = addUseCase.execute(cal2, { title: 'Task 2', memo: 'Regular work' });
 
-      const result = filterUseCase.execute(cal3, { query: '重要' });
+      const result = filterUseCase.execute(cal3, { query: 'Important' });
 
       assert.strictEqual(result.matchedCount, 1);
-      assert.strictEqual(result.filteredTasks[0].title, 'タスク1');
+      assert.strictEqual(result.filteredTasks[0].title, 'Task 1');
     });
 
     it('should filter by deadline title', () => {
       let calendar = createTaskCalendar();
-      const { calendar: cal1, newTask: task1 } = addUseCase.execute(calendar, { title: 'プロジェクトA' });
-      const { calendar: cal2 } = deadlineUseCase.execute(cal1, { taskId: task1.id, action: 'add', title: 'ドラフト提出' });
-      const { calendar: cal3 } = addUseCase.execute(cal2, { title: 'プロジェクトB' });
+      const { calendar: cal1, newTask: task1 } = addUseCase.execute(calendar, { title: 'Project A' });
+      const { calendar: cal2 } = deadlineUseCase.execute(cal1, { taskId: task1.id, action: 'add', title: 'Draft Submission' });
+      const { calendar: cal3 } = addUseCase.execute(cal2, { title: 'Project B' });
 
-      const result = filterUseCase.execute(cal3, { query: 'ドラフト' });
+      const result = filterUseCase.execute(cal3, { query: 'Draft' });
 
       assert.strictEqual(result.matchedCount, 1);
-      assert.strictEqual(result.filteredTasks[0].title, 'プロジェクトA');
+      assert.strictEqual(result.filteredTasks[0].title, 'Project A');
     });
 
     it('should be case insensitive', () => {
@@ -99,10 +99,10 @@ describe('FilterTasksUseCase', () => {
 
     it('should return empty when no matches', () => {
       let calendar = createTaskCalendar();
-      const { calendar: cal1 } = addUseCase.execute(calendar, { title: 'タスク1' });
-      const { calendar: cal2 } = addUseCase.execute(cal1, { title: 'タスク2' });
+      const { calendar: cal1 } = addUseCase.execute(calendar, { title: 'Task 1' });
+      const { calendar: cal2 } = addUseCase.execute(cal1, { title: 'Task 2' });
 
-      const result = filterUseCase.execute(cal2, { query: '存在しないキーワード' });
+      const result = filterUseCase.execute(cal2, { query: 'NonexistentKeyword' });
 
       assert.strictEqual(result.matchedCount, 0);
       assert.strictEqual(result.totalCount, 2);
@@ -113,38 +113,38 @@ describe('FilterTasksUseCase', () => {
   describe('wildcard filtering', () => {
     it('should match prefix with trailing asterisk', () => {
       let calendar = createTaskCalendar();
-      const { calendar: cal1 } = addUseCase.execute(calendar, { title: 'プレゼン' });
-      const { calendar: cal2 } = addUseCase.execute(cal1, { title: 'プレゼン資料' });
-      const { calendar: cal3 } = addUseCase.execute(cal2, { title: 'プレゼン準備会議' });
-      const { calendar: cal4 } = addUseCase.execute(cal3, { title: '会議資料' });
+      const { calendar: cal1 } = addUseCase.execute(calendar, { title: 'Presentation' });
+      const { calendar: cal2 } = addUseCase.execute(cal1, { title: 'Presentation Materials' });
+      const { calendar: cal3 } = addUseCase.execute(cal2, { title: 'Presentation Prep Meeting' });
+      const { calendar: cal4 } = addUseCase.execute(cal3, { title: 'Meeting Materials' });
 
-      const result = filterUseCase.execute(cal4, { query: 'プレゼン*' });
+      const result = filterUseCase.execute(cal4, { query: 'Presentation*' });
 
       assert.strictEqual(result.matchedCount, 3);
-      assert.ok(result.filteredTasks.every(t => t.title.startsWith('プレゼン')));
+      assert.ok(result.filteredTasks.every(t => t.title.startsWith('Presentation')));
     });
 
     it('should match suffix with leading asterisk', () => {
       let calendar = createTaskCalendar();
-      const { calendar: cal1 } = addUseCase.execute(calendar, { title: 'コードレビュー' });
-      const { calendar: cal2 } = addUseCase.execute(cal1, { title: 'デザインレビュー' });
-      const { calendar: cal3 } = addUseCase.execute(cal2, { title: 'レビュー会議' });
-      const { calendar: cal4 } = addUseCase.execute(cal3, { title: 'コード作成' });
+      const { calendar: cal1 } = addUseCase.execute(calendar, { title: 'Code Review' });
+      const { calendar: cal2 } = addUseCase.execute(cal1, { title: 'Design Review' });
+      const { calendar: cal3 } = addUseCase.execute(cal2, { title: 'Review Meeting' });
+      const { calendar: cal4 } = addUseCase.execute(cal3, { title: 'Code Creation' });
 
-      const result = filterUseCase.execute(cal4, { query: '*レビュー' });
+      const result = filterUseCase.execute(cal4, { query: '*Review' });
 
       assert.strictEqual(result.matchedCount, 2);
-      assert.ok(result.filteredTasks.every(t => t.title.endsWith('レビュー')));
+      assert.ok(result.filteredTasks.every(t => t.title.endsWith('Review')));
     });
 
     it('should match pattern with asterisk in middle', () => {
       let calendar = createTaskCalendar();
-      const { calendar: cal1 } = addUseCase.execute(calendar, { title: '設計書' });
-      const { calendar: cal2 } = addUseCase.execute(cal1, { title: '設計仕様書' });
-      const { calendar: cal3 } = addUseCase.execute(cal2, { title: '設計指示書' });
-      const { calendar: cal4 } = addUseCase.execute(cal3, { title: '基本設計' });
+      const { calendar: cal1 } = addUseCase.execute(calendar, { title: 'Design Doc' });
+      const { calendar: cal2 } = addUseCase.execute(cal1, { title: 'Design Spec Doc' });
+      const { calendar: cal3 } = addUseCase.execute(cal2, { title: 'Design Instruction Doc' });
+      const { calendar: cal4 } = addUseCase.execute(cal3, { title: 'Basic Design' });
 
-      const result = filterUseCase.execute(cal4, { query: '設計*書' });
+      const result = filterUseCase.execute(cal4, { query: 'Design*Doc' });
 
       assert.strictEqual(result.matchedCount, 3);
     });
@@ -177,7 +177,7 @@ describe('FilterTasksUseCase', () => {
       const { calendar: cal1 } = addUseCase.execute(calendar, { title: 'file.txt' });
       const { calendar: cal2 } = addUseCase.execute(cal1, { title: 'fileXtxt' });
 
-      // . は部分一致モードでもリテラルとして扱われるべき
+      // . should be treated as literal even in partial match mode
       const result = filterUseCase.execute(cal2, { query: 'file.txt' });
 
       assert.strictEqual(result.matchedCount, 1);
@@ -188,12 +188,12 @@ describe('FilterTasksUseCase', () => {
   describe('count information', () => {
     it('should return correct total and matched counts', () => {
       let calendar = createTaskCalendar();
-      const { calendar: cal1 } = addUseCase.execute(calendar, { title: 'マッチ1' });
-      const { calendar: cal2 } = addUseCase.execute(cal1, { title: 'マッチ2' });
-      const { calendar: cal3 } = addUseCase.execute(cal2, { title: '別のタスク' });
-      const { calendar: cal4 } = addUseCase.execute(cal3, { title: 'その他' });
+      const { calendar: cal1 } = addUseCase.execute(calendar, { title: 'Match 1' });
+      const { calendar: cal2 } = addUseCase.execute(cal1, { title: 'Match 2' });
+      const { calendar: cal3 } = addUseCase.execute(cal2, { title: 'Another Task' });
+      const { calendar: cal4 } = addUseCase.execute(cal3, { title: 'Other' });
 
-      const result = filterUseCase.execute(cal4, { query: 'マッチ' });
+      const result = filterUseCase.execute(cal4, { query: 'Match' });
 
       assert.strictEqual(result.totalCount, 4);
       assert.strictEqual(result.matchedCount, 2);

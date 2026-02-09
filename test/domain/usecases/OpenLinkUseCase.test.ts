@@ -52,7 +52,7 @@ describe('OpenLinkUseCase', () => {
 
       assert.strictEqual(result.success, false);
       assert.strictEqual(result.link, null);
-      assert.strictEqual(result.error, 'タスクが見つかりません');
+      assert.strictEqual(result.error, 'Task not found');
     });
 
     it('should fail when task has no link', () => {
@@ -62,7 +62,7 @@ describe('OpenLinkUseCase', () => {
       const result = openLinkUseCase.execute(calWithTask, { taskId: newTask.id });
 
       assert.strictEqual(result.success, false);
-      assert.strictEqual(result.error, 'リンクが設定されていません');
+      assert.strictEqual(result.error, 'Link is not set');
     });
 
     it('should fail when task has empty link', () => {
@@ -76,7 +76,7 @@ describe('OpenLinkUseCase', () => {
       const result = openLinkUseCase.execute(calWithLink, { taskId: newTask.id });
 
       assert.strictEqual(result.success, false);
-      assert.strictEqual(result.error, 'リンクが設定されていません');
+      assert.strictEqual(result.error, 'Link is not set');
     });
 
     it('should fail when link is invalid URL', () => {
@@ -90,7 +90,7 @@ describe('OpenLinkUseCase', () => {
       const result = openLinkUseCase.execute(calWithLink, { taskId: newTask.id });
 
       assert.strictEqual(result.success, false);
-      assert.strictEqual(result.error, '無効なURL形式です');
+      assert.strictEqual(result.error, 'Invalid URL format');
     });
 
     it('should fail when link has invalid protocol', () => {
@@ -104,7 +104,7 @@ describe('OpenLinkUseCase', () => {
       const result = openLinkUseCase.execute(calWithLink, { taskId: newTask.id });
 
       assert.strictEqual(result.success, false);
-      assert.strictEqual(result.error, '無効なURL形式です');
+      assert.strictEqual(result.error, 'Invalid URL format');
     });
 
     it('should handle complex URLs', () => {

@@ -1,71 +1,71 @@
 # Task Calendar
 
-VSCode内でタスクと締め切りを視覚的に管理できるガントチャート形式のタスク管理拡張機能です。
+A Gantt chart-style task management extension for VS Code that lets you visually manage tasks and deadlines.
 
-## デモ
+## Demo
 
-### タスクの作成
-![新規タスク作成](https://raw.githubusercontent.com/kitsune8848/task-calendar-extension/main/media/new_task.gif)
+### Create a Task
+![Create new task](https://raw.githubusercontent.com/kitsune8848/task-calendar-extension/main/media/new_task.gif)
 
-### 表示モードの切り替え
-![表示モード切り替え](https://raw.githubusercontent.com/kitsune8848/task-calendar-extension/main/media/view.gif)
+### Switch View Mode
+![Switch view mode](https://raw.githubusercontent.com/kitsune8848/task-calendar-extension/main/media/view.gif)
 
-## 機能
+## Features
 
-### ガントチャート表示
-- **日/週/月** の3つの表示モードでタスクを俯瞰
-- ドラッグ＆ドロップでタスクの期間を直感的に変更
-- タスクバーの両端をドラッグして開始日・終了日を調整
+### Gantt Chart Display
+- View tasks in 3 display modes: **Day / Week / Month**
+- Drag and drop to intuitively change task duration
+- Drag the edges of task bars to adjust start and end dates
 
-### タスク管理
-- **3つのステータス**: 実行中・待機中・完了
-- タスクごとに**複数の締め切り**を設定可能
-- タスクに**リンク**を追加してすぐにアクセス
-- **色分け**で視覚的にタスクを区別（9色対応）
+### Task Management
+- **3 status types**: In Progress, Waiting, Completed
+- Set **multiple deadlines** per task
+- Add **links** to tasks for quick access
+- Visually distinguish tasks with **color coding** (9 colors supported)
 
-### 締め切り管理
-- カレンダー上に締め切りマーカーを表示
-- 締め切りをドラッグして日付を変更
-- 完了した締め切りはチェックマークで管理
+### Deadline Management
+- Display deadline markers on calendar
+- Drag deadlines to change dates
+- Track completed deadlines with checkmarks
 
-### 検索・ソート
-- タスク名で絞り込み検索
-- 手動順/締切順でソート切替
+### Search and Sort
+- Filter tasks by task name
+- Switch between manual order and deadline order sorting
 
-### テーマ対応
-- ダークモード/ライトモード両対応
-- VSCodeのテーマ設定に自動追従
+### Theme Support
+- Light and dark mode support
+- Automatically follows VS Code theme settings
 
-## 使い方
+## Usage
 
-### ファイルの作成
-1. 新しいファイルを `.tcal` 拡張子で作成（例: `my-tasks.tcal`）
-2. ファイルを開くとTask Calendarエディタが起動
+### Create a File
+1. Create a new file with `.tcal` extension (example: `my-tasks.tcal`)
+2. Open the file and the Task Calendar editor will launch
 
-### タスクの追加
-1. 左上の「+ 追加」ボタンをクリック
-2. タスク名を入力
-3. 日付を設定してカレンダーに配置
+### Add a Task
+1. Click the "+ Add" button in the top left
+2. Enter the task name
+3. Set dates and place the task on the calendar
 
-### タスクの操作
-- **移動**: タスクバーをドラッグ
-- **期間変更**: タスクバーの端をドラッグ
-- **詳細編集**: 左列でタスクを選択
-- **リンクを開く**: カレンダー上のタスクをダブルクリック
-- **削除**: タスクを選択して Delete キー
+### Task Operations
+- **Move**: Drag the task bar
+- **Resize**: Drag the edges of the task bar
+- **Edit Details**: Select a task in the left panel
+- **Open Link**: Double-click a task on the calendar
+- **Delete**: Select a task and press Delete key
 
-### 締め切りの追加
-1. タスクを選択して詳細パネルを開く
-2. 「締切」セクションの「+」ボタンをクリック
-3. 日付と内容を入力
+### Add a Deadline
+1. Select a task to open the details panel
+2. Click the "+" button in the "Deadline" section
+3. Enter the date and content
 
-### 元に戻す・やり直し
-- **Ctrl+Z** (Mac: Cmd+Z): 操作を元に戻す
-- **Ctrl+Shift+Z** (Mac: Cmd+Shift+Z): やり直し
+### Undo and Redo
+- **Ctrl+Z** (Mac: Cmd+Z): Undo operation
+- **Ctrl+Shift+Z** (Mac: Cmd+Shift+Z): Redo operation
 
-## ファイル形式
+## File Format
 
-Task Calendarは `.tcal` ファイル（JSON形式）でデータを保存します。
+Task Calendar stores data in `.tcal` files (JSON format).
 
 ```json
 {
@@ -73,17 +73,17 @@ Task Calendarは `.tcal` ファイル（JSON形式）でデータを保存しま
   "tasks": [
     {
       "id": "unique-id",
-      "title": "タスク名",
+      "title": "Task name",
       "status": "in-progress",
       "startDate": "2026-02-05T00:00:00.000Z",
       "endDate": "2026-02-08T00:00:00.000Z",
-      "memo": "メモ内容",
+      "memo": "Memo content",
       "link": "https://example.com",
       "color": "blue",
       "deadlines": [
         {
           "id": "deadline-id",
-          "title": "締切名",
+          "title": "Deadline name",
           "date": "2026-02-07T00:00:00.000Z",
           "completed": false
         }
@@ -93,32 +93,32 @@ Task Calendarは `.tcal` ファイル（JSON形式）でデータを保存しま
 }
 ```
 
-## 設定
+## Settings
 
-この拡張機能は `.tcal` ファイルを開くと自動的に起動します。特別な設定は不要です。
+This extension automatically launches when you open a `.tcal` file. No special configuration is required.
 
-## 要件
+## Requirements
 
-- Visual Studio Code 1.74.0 以上
+- Visual Studio Code 1.74.0 or later
 
-## 既知の問題
+## Known Issues
 
-現在、既知の重大な問題はありません。問題を発見した場合は、GitHubのIssueで報告してください。
+There are currently no known critical issues. If you discover any issues, please report them on GitHub Issues.
 
-## リリースノート
+## Release Notes
 
 ### 1.0.0
 
-初回リリース
+Initial release
 
-- ガントチャート形式のタスク表示
-- 日/週/月の3つの表示モード
-- タスクのドラッグ＆ドロップ操作
-- 複数締め切りの管理
-- ダークモード/ライトモード対応
-- タスクの色分け機能
-- 検索・ソート機能
+- Gantt chart-style task display
+- 3 display modes: Day / Week / Month
+- Drag and drop task operations
+- Multiple deadline management
+- Dark and light mode support
+- Task color coding feature
+- Search and sort functionality
 
-## ライセンス
+## License
 
 MIT License

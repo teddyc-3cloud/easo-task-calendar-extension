@@ -16,7 +16,7 @@ describe('Task Entity', () => {
   describe('createTask', () => {
     it('should create task with default values', () => {
       const task = createTask();
-      assert.strictEqual(task.title, '新しいタスク');
+      assert.strictEqual(task.title, 'New Task');
       assert.strictEqual(task.status, 'undefined');
       assert.strictEqual(task.memo, '');
       assert.strictEqual(task.link, '');
@@ -31,14 +31,14 @@ describe('Task Entity', () => {
     it('should create task with custom values', () => {
       const customDate = new Date('2026-02-01');
       const task = createTask({
-        title: 'カスタムタスク',
-        memo: 'メモ',
+        title: 'Custom Task',
+        memo: 'Memo',
         status: 'in-progress',
         startDate: customDate,
         priority: 'high',
       });
-      assert.strictEqual(task.title, 'カスタムタスク');
-      assert.strictEqual(task.memo, 'メモ');
+      assert.strictEqual(task.title, 'Custom Task');
+      assert.strictEqual(task.memo, 'Memo');
       assert.strictEqual(task.status, 'in-progress');
       assert.deepStrictEqual(task.startDate, customDate);
       assert.strictEqual(task.priority, 'high');
@@ -48,7 +48,7 @@ describe('Task Entity', () => {
   describe('createDeadline', () => {
     it('should create deadline with default values', () => {
       const deadline = createDeadline();
-      assert.strictEqual(deadline.title, '新しい締切');
+      assert.strictEqual(deadline.title, 'New Deadline');
       assert.strictEqual(deadline.date, null);
       assert.strictEqual(deadline.completed, false);
       assert.ok(deadline.id);
@@ -57,11 +57,11 @@ describe('Task Entity', () => {
     it('should create deadline with custom values', () => {
       const date = new Date('2026-02-15');
       const deadline = createDeadline({
-        title: 'カスタム締切',
+        title: 'Custom Deadline',
         date,
         completed: true,
       });
-      assert.strictEqual(deadline.title, 'カスタム締切');
+      assert.strictEqual(deadline.title, 'Custom Deadline');
       assert.deepStrictEqual(deadline.date, date);
       assert.strictEqual(deadline.completed, true);
     });
@@ -70,7 +70,7 @@ describe('Task Entity', () => {
   describe('validateTask', () => {
     it('should return no errors for valid task', () => {
       const task = createTask({
-        title: '有効なタスク',
+        title: 'Valid Task',
         startDate: new Date('2026-02-01'),
         endDate: new Date('2026-02-10'),
       });
@@ -94,7 +94,7 @@ describe('Task Entity', () => {
 
     it('should return error when start date is after end date', () => {
       const task = createTask({
-        title: 'テスト',
+        title: 'Test',
         startDate: new Date('2026-02-10'),
         endDate: new Date('2026-02-01'),
       });
@@ -104,12 +104,12 @@ describe('Task Entity', () => {
 
     it('should return error when deadline is outside task period', () => {
       const task = createTask({
-        title: 'テスト',
+        title: 'Test',
         startDate: new Date('2026-02-01'),
         endDate: new Date('2026-02-10'),
         deadlines: [
           createDeadline({
-            title: '範囲外締切',
+            title: 'Out of Range Deadline',
             date: new Date('2026-02-15'),
           }),
         ],
@@ -120,12 +120,12 @@ describe('Task Entity', () => {
 
     it('should allow deadline within task period', () => {
       const task = createTask({
-        title: 'テスト',
+        title: 'Test',
         startDate: new Date('2026-02-01'),
         endDate: new Date('2026-02-10'),
         deadlines: [
           createDeadline({
-            title: '範囲内締切',
+            title: 'In Range Deadline',
             date: new Date('2026-02-05'),
           }),
         ],
@@ -138,7 +138,7 @@ describe('Task Entity', () => {
   describe('isTaskOverdue', () => {
     it('should return true for overdue task', () => {
       const task = createTask({
-        title: 'テスト',
+        title: 'Test',
         status: 'in-progress',
         endDate: new Date('2020-01-01'),
       });
@@ -147,7 +147,7 @@ describe('Task Entity', () => {
 
     it('should return false for completed task', () => {
       const task = createTask({
-        title: 'テスト',
+        title: 'Test',
         status: 'completed',
         endDate: new Date('2020-01-01'),
       });
@@ -156,7 +156,7 @@ describe('Task Entity', () => {
 
     it('should return false for task without end date', () => {
       const task = createTask({
-        title: 'テスト',
+        title: 'Test',
         status: 'in-progress',
       });
       assert.strictEqual(isTaskOverdue(task), false);
@@ -164,7 +164,7 @@ describe('Task Entity', () => {
 
     it('should return false for task ending in the future', () => {
       const task = createTask({
-        title: 'テスト',
+        title: 'Test',
         status: 'in-progress',
         endDate: new Date('2030-12-31'),
       });
@@ -175,9 +175,9 @@ describe('Task Entity', () => {
   describe('hasUncompletedDeadlines', () => {
     it('should return true when there are uncompleted deadlines', () => {
       const task = createTask({
-        title: 'テスト',
+        title: 'Test',
         deadlines: [
-          createDeadline({ title: '未完了', completed: false }),
+          createDeadline({ title: 'Uncompleted', completed: false }),
         ],
       });
       assert.strictEqual(hasUncompletedDeadlines(task), true);
@@ -185,17 +185,17 @@ describe('Task Entity', () => {
 
     it('should return false when all deadlines are completed', () => {
       const task = createTask({
-        title: 'テスト',
+        title: 'Test',
         deadlines: [
-          createDeadline({ title: '完了1', completed: true }),
-          createDeadline({ title: '完了2', completed: true }),
+          createDeadline({ title: 'Completed1', completed: true }),
+          createDeadline({ title: 'Completed2', completed: true }),
         ],
       });
       assert.strictEqual(hasUncompletedDeadlines(task), false);
     });
 
     it('should return false when there are no deadlines', () => {
-      const task = createTask({ title: 'テスト' });
+      const task = createTask({ title: 'Test' });
       assert.strictEqual(hasUncompletedDeadlines(task), false);
     });
   });
@@ -203,22 +203,22 @@ describe('Task Entity', () => {
   describe('getNextDeadline', () => {
     it('should return the earliest uncompleted deadline', () => {
       const task = createTask({
-        title: 'テスト',
+        title: 'Test',
         deadlines: [
-          createDeadline({ title: '後', date: new Date('2026-02-15'), completed: false }),
-          createDeadline({ title: '先', date: new Date('2026-02-10'), completed: false }),
-          createDeadline({ title: '完了', date: new Date('2026-02-05'), completed: true }),
+          createDeadline({ title: 'Later', date: new Date('2026-02-15'), completed: false }),
+          createDeadline({ title: 'Earlier', date: new Date('2026-02-10'), completed: false }),
+          createDeadline({ title: 'Completed', date: new Date('2026-02-05'), completed: true }),
         ],
       });
       const next = getNextDeadline(task);
-      assert.strictEqual(next?.title, '先');
+      assert.strictEqual(next?.title, 'Earlier');
     });
 
     it('should return null when no uncompleted deadlines', () => {
       const task = createTask({
-        title: 'テスト',
+        title: 'Test',
         deadlines: [
-          createDeadline({ title: '完了', completed: true, date: new Date() }),
+          createDeadline({ title: 'Completed', completed: true, date: new Date() }),
         ],
       });
       assert.strictEqual(getNextDeadline(task), null);
@@ -226,21 +226,21 @@ describe('Task Entity', () => {
 
     it('should ignore deadlines without dates', () => {
       const task = createTask({
-        title: 'テスト',
+        title: 'Test',
         deadlines: [
-          createDeadline({ title: '日付なし', date: null }),
-          createDeadline({ title: '日付あり', date: new Date('2026-02-10') }),
+          createDeadline({ title: 'No Date', date: null }),
+          createDeadline({ title: 'Has Date', date: new Date('2026-02-10') }),
         ],
       });
       const next = getNextDeadline(task);
-      assert.strictEqual(next?.title, '日付あり');
+      assert.strictEqual(next?.title, 'Has Date');
     });
   });
 
   describe('calculateTaskDuration', () => {
     it('should calculate correct duration', () => {
       const task = createTask({
-        title: 'テスト',
+        title: 'Test',
         startDate: new Date('2026-02-01'),
         endDate: new Date('2026-02-05'),
       });
@@ -250,7 +250,7 @@ describe('Task Entity', () => {
     it('should return 1 for same-day task', () => {
       const date = new Date('2026-02-01');
       const task = createTask({
-        title: 'テスト',
+        title: 'Test',
         startDate: date,
         endDate: date,
       });
@@ -258,7 +258,7 @@ describe('Task Entity', () => {
     });
 
     it('should return 0 for task without dates', () => {
-      const task = createTask({ title: 'テスト' });
+      const task = createTask({ title: 'Test' });
       assert.strictEqual(calculateTaskDuration(task), 0);
     });
   });
@@ -266,11 +266,11 @@ describe('Task Entity', () => {
   describe('moveTaskDates', () => {
     it('should shift all dates forward', () => {
       const task = createTask({
-        title: 'テスト',
+        title: 'Test',
         startDate: new Date('2026-02-01'),
         endDate: new Date('2026-02-05'),
         deadlines: [
-          createDeadline({ title: '締切', date: new Date('2026-02-03') }),
+          createDeadline({ title: 'Deadline', date: new Date('2026-02-03') }),
         ],
       });
       const moved = moveTaskDates(task, 5);
@@ -281,7 +281,7 @@ describe('Task Entity', () => {
 
     it('should shift all dates backward', () => {
       const task = createTask({
-        title: 'テスト',
+        title: 'Test',
         startDate: new Date('2026-02-10'),
         endDate: new Date('2026-02-15'),
       });
@@ -291,7 +291,7 @@ describe('Task Entity', () => {
     });
 
     it('should preserve task without dates', () => {
-      const task = createTask({ title: 'テスト' });
+      const task = createTask({ title: 'Test' });
       const moved = moveTaskDates(task, 5);
       assert.strictEqual(moved.startDate, null);
       assert.strictEqual(moved.endDate, null);
@@ -301,7 +301,7 @@ describe('Task Entity', () => {
   describe('extendTaskStart', () => {
     it('should change start date', () => {
       const task = createTask({
-        title: 'テスト',
+        title: 'Test',
         startDate: new Date('2026-02-05'),
         endDate: new Date('2026-02-10'),
       });
@@ -315,7 +315,7 @@ describe('Task Entity', () => {
   describe('extendTaskEnd', () => {
     it('should change end date', () => {
       const task = createTask({
-        title: 'テスト',
+        title: 'Test',
         startDate: new Date('2026-02-05'),
         endDate: new Date('2026-02-10'),
       });

@@ -1,6 +1,7 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { Task, TaskStatus, ViewMode, TaskColor } from '../types';
 import { ThemeColors } from '../theme';
+import { formatMonthYear } from '../constants/strings';
 import { getDaysArray, formatDateWithDay, getWeekNumber, isWeekend, isToday, daysBetween, addDays, formatDateShort } from '../utils/dateUtils';
 import { Link, Star } from 'lucide-react';
 
@@ -25,21 +26,21 @@ interface TimelineProps {
 
 const DAYS_TO_SHOW = 7300;
 const DAY_COLUMN_WIDTH = 50;
-const WEEK_COLUMN_WIDTH = 50; // 週表示時のカラム幅
-const MONTH_COLUMN_WIDTH = 80; // 月表示時のカラム幅
+const WEEK_COLUMN_WIDTH = 50; // Column width for week view
+const MONTH_COLUMN_WIDTH = 80; // Column width for month view
 const ROW_HEIGHT = 40;
 const SECTION_HEADER_HEIGHT = 29;
-const MONTH_ROW_HEIGHT = 20; // 月の行の高さ
-const DATE_ROW_HEIGHT = 32; // 日付の行の高さ
-const HEADER_HEIGHT = MONTH_ROW_HEIGHT + DATE_ROW_HEIGHT; // 合計ヘッダー高さ
+const MONTH_ROW_HEIGHT = 20; // Month row height
+const DATE_ROW_HEIGHT = 32; // Date row height
+const HEADER_HEIGHT = MONTH_ROW_HEIGHT + DATE_ROW_HEIGHT; // Total header height
 
-// 週の配列を生成（月曜始まり）
+// Generate weeks array (Monday start)
 const getWeeksArray = (startDate: Date, numWeeks: number): { weekNum: number; year: number; startDay: Date }[] => {
   const weeks: { weekNum: number; year: number; startDay: Date }[] = [];
-  // 開始日を含む週の月曜日を見つける
+  // Find the Monday of the week containing the start date
   const firstDay = new Date(startDate);
   const dayOfWeek = firstDay.getDay();
-  const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // 月曜日に調整
+  const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Adjust to Monday
   firstDay.setDate(firstDay.getDate() + diff);
   
   for (let i = 0; i < numWeeks; i++) {
@@ -54,7 +55,7 @@ const getWeeksArray = (startDate: Date, numWeeks: number): { weekNum: number; ye
   return weeks;
 };
 
-// 月の配列を生成
+// Generate months array
 const getMonthsArray = (startDate: Date, numMonths: number): { month: number; year: number; startDay: Date }[] => {
   const months: { month: number; year: number; startDay: Date }[] = [];
   const firstMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
@@ -96,13 +97,13 @@ export const Timeline: React.FC<TimelineProps> = ({
   const [hoveredDeadline, setHoveredDeadline] = useState<{ id: string; title: string; date: string; x: number; y: number } | null>(null);
   const lastScrollTopRef = useRef(0);
 
-  // テーマからgetTaskColorを作成
+  // Create getTaskColor from theme
   const getTaskColor = (task: Task) => {
     const color = task.color || 'blue';
     return taskColors[color] || taskColors.blue;
   };
 
-  // 表示モードに応じてカラム幅を決定
+  // Determine column width based on view mode
   const COLUMN_WIDTH = viewMode === 'month' ? MONTH_COLUMN_WIDTH : viewMode === 'week' ? WEEK_COLUMN_WIDTH : DAY_COLUMN_WIDTH;
   const WEEKS_TO_SHOW = Math.ceil(DAYS_TO_SHOW / 7);
   const MONTHS_TO_SHOW = Math.ceil(DAYS_TO_SHOW / 30);
@@ -115,14 +116,14 @@ export const Timeline: React.FC<TimelineProps> = ({
   const waitingTasks = tasks.filter(t => t.status === 'waiting');
   const completedTasks = tasks.filter(t => t.status === 'completed');
   
-  // scrollToTodayTriggerの前回値を保持
+  // Keep previous value of scrollToTodayTrigger
   const prevScrollToTodayTriggerRef = useRef(scrollToTodayTrigger);
 
-  // 初期表示で今日の位置にスクロール
+  // Scroll to today's position on initial display
   useEffect(() => {
     if (containerRef.current) {
       if (viewMode === 'month') {
-        // 月表示: 今月のインデックスを探す
+        // Month view: Find current month index
         const today = new Date();
         const monthIndex = months.findIndex(m => m.month === today.getMonth() + 1 && m.year === today.getFullYear());
         if (monthIndex >= 0) {
@@ -130,7 +131,7 @@ export const Timeline: React.FC<TimelineProps> = ({
           containerRef.current.scrollLeft = scrollPosition;
         }
       } else if (viewMode === 'week') {
-        // 週表示: 今週のインデックスを探す
+        // Week view: Find current week index
         const today = new Date();
         const todayWeekNum = getWeekNumber(today);
         const todayYear = today.getFullYear();
@@ -140,7 +141,7 @@ export const Timeline: React.FC<TimelineProps> = ({
           containerRef.current.scrollLeft = scrollPosition;
         }
       } else {
-        // 日表示
+        // Day view
         const todayIndex = days.findIndex(d => isToday(d));
         if (todayIndex >= 0) {
           const scrollPosition = Math.max(0, (todayIndex - 5) * COLUMN_WIDTH);
@@ -148,11 +149,11 @@ export const Timeline: React.FC<TimelineProps> = ({
         }
       }
     }
-  }, [viewMode]); // viewMode変更時にも再スクロール
+  }, [viewMode]); // Also re-scroll when viewMode changes
 
-  // 「今日へ移動」ボタンが押されたときにスクロール（triggerが変化した時のみ）
+  // Scroll when "go to today" button is pressed (only when trigger changes)
   useEffect(() => {
-    // triggerが実際に変化した場合のみ実行
+    // Execute only when trigger actually changes
     if (scrollToTodayTrigger > prevScrollToTodayTriggerRef.current && containerRef.current) {
       if (viewMode === 'month') {
         const today = new Date();
@@ -196,7 +197,7 @@ export const Timeline: React.FC<TimelineProps> = ({
     if (taskEnd < timelineStart || taskStart > timelineEnd) return null;
     
     if (viewMode === 'month') {
-      // 月表示: 月単位で位置を計算
+      // Month view: Calculate position in month units
       const startMonthIndex = months.findIndex(m => 
         m.year === taskStart.getFullYear() && m.month === taskStart.getMonth() + 1
       );
@@ -209,7 +210,7 @@ export const Timeline: React.FC<TimelineProps> = ({
         width: Math.max((endMonthIndex - startMonthIndex + 1) * COLUMN_WIDTH - 4, COLUMN_WIDTH - 4),
       };
     } else if (viewMode === 'week') {
-      // 週表示: 週単位で位置を計算
+      // Week view: Calculate position in week units
       const startDays = daysBetween(timelineStart, taskStart);
       const endDays = daysBetween(timelineStart, taskEnd);
       const startWeekIndex = Math.floor(startDays / 7);
@@ -219,7 +220,7 @@ export const Timeline: React.FC<TimelineProps> = ({
         width: Math.max((endWeekIndex - startWeekIndex + 1) * COLUMN_WIDTH - 4, COLUMN_WIDTH - 4),
       };
     } else {
-      // 日表示
+      // Day view
       const startOffset = Math.max(0, daysBetween(timelineStart, taskStart));
       const endOffset = Math.min(DAYS_TO_SHOW - 1, daysBetween(timelineStart, taskEnd));
       return {
@@ -229,27 +230,27 @@ export const Timeline: React.FC<TimelineProps> = ({
     }
   };
 
-  // リサイズ開始
+  // Start resize
   const handleResizeStart = useCallback((e: React.MouseEvent, taskId: string, edge: 'start' | 'end', currentDate: Date) => {
     e.stopPropagation();
     e.preventDefault();
     setResizing({ taskId, edge, startX: e.clientX, originalDate: currentDate });
   }, []);
 
-  // ドラッグ（移動）開始
+  // Start drag (move)
   const handleDragStart = useCallback((e: React.MouseEvent, taskId: string, _startDate: Date) => {
     e.stopPropagation();
     setDragging({ taskId, startX: e.clientX, initialStartX: e.clientX });
   }, []);
 
-  // 締切ドラッグ開始
+  // Start deadline drag
   const handleDeadlineDragStart = useCallback((e: React.MouseEvent, taskId: string, deadlineId: string, date: Date) => {
     e.stopPropagation();
     e.preventDefault();
     setDeadlineDragging({ taskId, deadlineId, startX: e.clientX, originalDate: date });
   }, []);
 
-  // マウス移動
+  // Mouse move
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (resizing) {
       const deltaX = e.clientX - resizing.startX;
@@ -261,14 +262,14 @@ export const Timeline: React.FC<TimelineProps> = ({
         setResizing({ ...resizing, startX: e.clientX, originalDate: newDate });
       }
     } else if (dragging) {
-      // initialStartXからの累積移動量で日数を計算
+      // Calculate day count from cumulative movement since initialStartX
       const totalDeltaX = e.clientX - dragging.initialStartX;
       const unitDays = viewMode === 'month' ? 30 : viewMode === 'week' ? 7 : 1;
       const unitsDelta = Math.round(totalDeltaX / COLUMN_WIDTH);
       const prevDeltaX = dragging.startX - dragging.initialStartX;
       const prevUnitsDelta = Math.round(prevDeltaX / COLUMN_WIDTH);
       
-      // 単位が変わった場合のみ更新
+      // Update only when unit changes
       if (unitsDelta !== prevUnitsDelta) {
         const incrementalDelta = (unitsDelta - prevUnitsDelta) * unitDays;
         onTaskMove(dragging.taskId, incrementalDelta);
@@ -286,14 +287,14 @@ export const Timeline: React.FC<TimelineProps> = ({
     }
   }, [resizing, dragging, deadlineDragging, onTaskResize, onTaskMove, onDeadlineMove, viewMode, COLUMN_WIDTH]);
 
-  // マウスアップ
+  // Mouse up
   const handleMouseUp = useCallback(() => {
     setResizing(null);
     setDragging(null);
     setDeadlineDragging(null);
   }, []);
 
-  // 締切マーカー描画
+  // Render deadline markers
   const renderDeadlineMarkers = (task: Task, barStyle: { left: number; width: number }) => {
     if (!task.startDate) return null;
     const timelineStart = days[0];
@@ -301,20 +302,20 @@ export const Timeline: React.FC<TimelineProps> = ({
     const uncompletedDeadlines = task.deadlines.filter(d => d.date && !d.completed);
     if (uncompletedDeadlines.length === 0) return null;
 
-    // 同じ位置の締切をグループ化してオフセットを計算
+    // Group deadlines at the same position and calculate offset
     const positionMap = new Map<number, number>(); // position -> count
 
     return uncompletedDeadlines.map((deadline, index) => {
-      // deadline.dateは文字列の可能性があるため、明示的にDateに変換
+      // deadline.date may be a string, so explicitly convert to Date
       const deadlineDateStr = typeof deadline.date === 'string' ? deadline.date : deadline.date;
       const deadlineDate = new Date(deadlineDateStr!);
       const dayOffset = daysBetween(timelineStart, deadlineDate);
       if (dayOffset < 0 || dayOffset >= DAYS_TO_SHOW) return null;
 
-      // 表示モードに応じて位置を計算
+      // Calculate position based on view mode
       let markerLeft: number;
       if (viewMode === 'month') {
-        // 月表示: 締切日の月のインデックスを探す
+        // Month view: Find the month index for the deadline date
         const monthIndex = months.findIndex(m => 
           m.year === deadlineDate.getFullYear() && m.month === deadlineDate.getMonth() + 1
         );
@@ -326,13 +327,13 @@ export const Timeline: React.FC<TimelineProps> = ({
         markerLeft = dayOffset * COLUMN_WIDTH + COLUMN_WIDTH / 2;
       }
       
-      // 同じ位置の締切のオフセットを計算
+      // Calculate offset for deadlines at the same position
       const posKey = Math.round(markerLeft);
       const offsetIndex = positionMap.get(posKey) || 0;
       positionMap.set(posKey, offsetIndex + 1);
       
       const isDragging = deadlineDragging?.deadlineId === deadline.id;
-      const verticalOffset = offsetIndex * 18; // 18pxずつ下にずらす
+      const verticalOffset = offsetIndex * 18; // Offset by 18px downward
 
       return (
         <div
@@ -350,7 +351,7 @@ export const Timeline: React.FC<TimelineProps> = ({
           }}
           onMouseLeave={() => setHoveredDeadline(null)}
           onMouseDown={e => {
-            e.stopPropagation(); // ドラッグスクロールを防止
+            e.stopPropagation(); // Prevent drag scroll
             setHoveredDeadline(null);
             handleDeadlineDragStart(e, task.id, deadline.id, deadlineDate);
           }}
@@ -414,11 +415,11 @@ export const Timeline: React.FC<TimelineProps> = ({
         onClick={e => { e.stopPropagation(); onSelectTask(task.id); }}
         onDoubleClick={e => { e.stopPropagation(); onTaskDoubleClick(task.id); }}
         onMouseDown={e => {
-          e.stopPropagation(); // ドラッグスクロールを防止
+          e.stopPropagation(); // Prevent drag scroll
           if (e.button === 0) handleDragStart(e, task.id, new Date(task.startDate!));
         }}
       >
-        {/* 左リサイズハンドル */}
+        {/* Left resize handle */}
         <div
           data-resize-handle="true"
           style={{
@@ -440,14 +441,14 @@ export const Timeline: React.FC<TimelineProps> = ({
             handleResizeStart(e, task.id, 'start', new Date(task.startDate!));
           }}
         >
-          {/* グリップライン */}
+          {/* Grip lines */}
           <div style={{ display: 'flex', gap: 1 }}>
             <div style={{ width: 1, height: 10, backgroundColor: 'rgba(255,255,255,0.4)', borderRadius: 1 }} />
             <div style={{ width: 1, height: 10, backgroundColor: 'rgba(255,255,255,0.4)', borderRadius: 1 }} />
           </div>
         </div>
 
-        {/* 右リサイズハンドル */}
+        {/* Right resize handle */}
         <div
           data-resize-handle="true"
           style={{
@@ -469,17 +470,17 @@ export const Timeline: React.FC<TimelineProps> = ({
             handleResizeStart(e, task.id, 'end', new Date(task.endDate!));
           }}
         >
-          {/* グリップライン */}
+          {/* Grip lines */}
           <div style={{ display: 'flex', gap: 1 }}>
             <div style={{ width: 1, height: 10, backgroundColor: 'rgba(255,255,255,0.4)', borderRadius: 1 }} />
             <div style={{ width: 1, height: 10, backgroundColor: 'rgba(255,255,255,0.4)', borderRadius: 1 }} />
           </div>
         </div>
 
-        {/* コンテンツ */}
+        {/* Content */}
         {hasLink && <Link size={10} color="rgba(255,255,255,0.8)" />}
 
-        {/* 締切マーカー */}
+        {/* Deadline markers */}
         {renderDeadlineMarkers(task, style)}
       </div>
     );
@@ -507,7 +508,7 @@ export const Timeline: React.FC<TimelineProps> = ({
     const minRows = Math.max(sectionTasks.length, 1);
     const totalWidth = viewMode === 'month' ? months.length * COLUMN_WIDTH : viewMode === 'week' ? weeks.length * COLUMN_WIDTH : DAYS_TO_SHOW * COLUMN_WIDTH;
     
-    // タスク行の背景色（ステータスに応じた薄い色）
+    // Task row background color (light color based on status)
     const taskRowBgColor = status === 'in-progress' 
       ? theme.sectionInProgress 
       : status === 'waiting' 
@@ -516,9 +517,9 @@ export const Timeline: React.FC<TimelineProps> = ({
     
     return (
       <div style={{ minWidth: totalWidth }}>
-        {/* セクションヘッダー行（統一した灰色背景） */}
+        {/* Section header row (unified gray background) */}
         <div style={{ height: SECTION_HEADER_HEIGHT, borderBottom: `1px solid ${theme.border}`, minWidth: totalWidth, backgroundColor: theme.sectionHeaderBg }} />
-        {/* 折りたたまれていない場合のみタスクを表示 */}
+        {/* Show tasks only when not collapsed */}
         {!isCollapsed && (
           <div style={{ minHeight: minRows * ROW_HEIGHT, backgroundColor: taskRowBgColor }}>
             {sectionTasks.length === 0 ? (
@@ -532,15 +533,15 @@ export const Timeline: React.FC<TimelineProps> = ({
     );
   };
 
-  // 外部からのスクロール中フラグ
+  // Flag for scrolling from external source
   const isExternalScrollRef = useRef(false);
 
-  // 外部からの縦スクロール同期
+  // Sync vertical scroll from external source
   useEffect(() => {
     if (containerRef.current && Math.abs(containerRef.current.scrollTop - verticalScrollTop) > 1) {
       isExternalScrollRef.current = true;
       containerRef.current.scrollTop = verticalScrollTop;
-      // フラグをリセット
+      // Reset flag
       requestAnimationFrame(() => {
         isExternalScrollRef.current = false;
       });
@@ -548,25 +549,25 @@ export const Timeline: React.FC<TimelineProps> = ({
   }, [verticalScrollTop]);
 
   const handleContainerScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    // 外部からのスクロールの場合は通知しない
+    // Do not notify if scrolling from external source
     if (isExternalScrollRef.current) return;
     
     const newScrollTop = e.currentTarget.scrollTop;
-    // 変化があった場合のみ通知（0以上の値のみ）
+    // Notify only if there is a change (only values >= 0)
     if (newScrollTop >= 0 && Math.abs(newScrollTop - lastScrollTopRef.current) > 1) {
       lastScrollTopRef.current = newScrollTop;
       onVerticalScroll(newScrollTop);
     }
   };
 
-  // ドラッグスクロール用の状態
+  // State for drag scrolling
   const [isDragScrolling, setIsDragScrolling] = useState(false);
   const dragScrollStart = useRef<{ x: number; y: number; scrollLeft: number; scrollTop: number } | null>(null);
 
   const handleMouseDownForScroll = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    // 左クリックのみ、かつタスクバー等でない場所
+    // Left click only, and not on task bar or similar elements
     if (e.button !== 0) return;
-    // タスクバーやリサイズハンドルの場合は無視（pointerEvents: autoの要素）
+    // Ignore if on task bar or resize handle (elements with pointerEvents: auto)
     const target = e.target as HTMLElement;
     if (target.closest('[data-task-bar]') || target.closest('[data-resize-handle]') || target.closest('[data-deadline-marker]')) {
       return;
@@ -599,7 +600,7 @@ export const Timeline: React.FC<TimelineProps> = ({
     dragScrollStart.current = null;
   }, []);
 
-  // 既存のマウスイベントと統合
+  // Integrate with existing mouse events
   const handleCombinedMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (isDragScrolling) {
       handleMouseMoveForScroll(e);
@@ -633,14 +634,14 @@ export const Timeline: React.FC<TimelineProps> = ({
       }}
       className="timeline-container"
     >
-      {/* ヘッダー */}
+      {/* Header */}
       <div style={{ position: 'sticky', top: 0, zIndex: 30, backgroundColor: theme.bgTertiary }}>
-        {/* 年/月の行 */}
+        {/* Year/Month row */}
         <div style={{ display: 'flex', height: MONTH_ROW_HEIGHT }}>
           {(() => {
             const today = new Date();
             if (viewMode === 'month') {
-              // 月表示: 年をグループ化
+              // Month view: Group by year
               const yearGroups: { year: number; count: number; isCurrentYear: boolean }[] = [];
               let currentYear = -1;
               let count = 0;
@@ -677,11 +678,11 @@ export const Timeline: React.FC<TimelineProps> = ({
                     borderBottom: `1px solid ${theme.borderLight}`,
                   }}
                 >
-                  {group.year}年
+                  {group.year}
                 </div>
               ));
             } else if (viewMode === 'week') {
-              // 週表示: 週ごとの月をグループ化
+              // Week view: Group months by week
               const monthGroups: { month: string; count: number; isCurrentMonth: boolean }[] = [];
               let currentMonth = '';
               let count = 0;
@@ -719,11 +720,11 @@ export const Timeline: React.FC<TimelineProps> = ({
                     borderBottom: `1px solid ${theme.borderLight}`,
                   }}
                 >
-                  {group.month}月
+                  {formatMonthYear(parseInt(group.month.split('/')[1]), parseInt(group.month.split('/')[0]))}
                 </div>
               ));
             } else {
-              // 日表示: 日ごとの月をグループ化
+              // Day view: Group months by day
               const monthGroups: { month: string; count: number; isCurrentMonth: boolean }[] = [];
               let currentMonth = '';
               let count = 0;
@@ -761,16 +762,16 @@ export const Timeline: React.FC<TimelineProps> = ({
                     borderBottom: `1px solid ${theme.borderLight}`,
                   }}
                 >
-                  {group.month}月
+                  {formatMonthYear(parseInt(group.month.split('/')[1]), parseInt(group.month.split('/')[0]))}
                 </div>
               ));
             }
           })()}
         </div>
-        {/* 日付/週/月の行 */}
+        {/* Date/Week/Month row */}
         <div style={{ display: 'flex', height: DATE_ROW_HEIGHT }}>
           {viewMode === 'month' ? (
-            // 月表示: 1月, 2月, ... 形式
+            // Month view: 1, 2, ... format
             months.map((month, index) => {
               const isCurrentMonth = month.month === new Date().getMonth() + 1 && month.year === new Date().getFullYear();
               return (
@@ -790,13 +791,13 @@ export const Timeline: React.FC<TimelineProps> = ({
                   }}
                 >
                   <div style={{ fontSize: 11, fontWeight: 600, color: isCurrentMonth ? theme.textToday : theme.textSecondary }}>
-                    {month.month}月
+                    {formatMonthYear(month.month, month.year)}
                   </div>
                 </div>
               );
             })
           ) : viewMode === 'week' ? (
-            // 週表示: W1, W2, ... 形式
+            // Week view: W1, W2, ... format
             weeks.map((week, index) => {
               const isCurrentWeek = week.weekNum === getWeekNumber(new Date()) && week.year === new Date().getFullYear();
               return (
@@ -822,7 +823,7 @@ export const Timeline: React.FC<TimelineProps> = ({
               );
             })
           ) : (
-            // 日表示
+            // Day view
             days.map((day, index) => (
               <div
                 key={index}
@@ -848,9 +849,9 @@ export const Timeline: React.FC<TimelineProps> = ({
         </div>
       </div>
 
-      {/* ボディ */}
+      {/* Body */}
       <div style={{ position: 'relative' }}>
-        {/* 背景グリッド（視覚的な表示のみ） */}
+        {/* Background grid (visual display only) */}
         <div style={{ display: 'flex', position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1, pointerEvents: 'none' }}>
           {viewMode === 'month' ? (
             months.map((month, index) => {
@@ -900,7 +901,7 @@ export const Timeline: React.FC<TimelineProps> = ({
           )}
         </div>
 
-        {/* タスク行 */}
+        {/* Task rows */}
         <div 
           style={{ position: 'relative', zIndex: 10 }}
           onDragOver={e => { e.preventDefault(); }}
@@ -913,19 +914,19 @@ export const Timeline: React.FC<TimelineProps> = ({
               const x = e.clientX - containerRect.left + scrollLeft;
               
               if (viewMode === 'month') {
-                // 月表示: 月の開始日にドロップ
+                // Month view: Drop to month start date
                 const monthIndex = Math.floor(x / COLUMN_WIDTH);
                 if (monthIndex >= 0 && monthIndex < months.length) {
                   onTaskDrop(taskId, months[monthIndex].startDay);
                 }
               } else if (viewMode === 'week') {
-                // 週表示: 週の開始日にドロップ
+                // Week view: Drop to week start date
                 const weekIndex = Math.floor(x / COLUMN_WIDTH);
                 if (weekIndex >= 0 && weekIndex < weeks.length) {
                   onTaskDrop(taskId, weeks[weekIndex].startDay);
                 }
               } else {
-                // 日表示
+                // Day view
                 const dayIndex = Math.floor(x / COLUMN_WIDTH);
                 if (dayIndex >= 0 && dayIndex < days.length) {
                   onTaskDrop(taskId, days[dayIndex]);
@@ -939,7 +940,7 @@ export const Timeline: React.FC<TimelineProps> = ({
           {renderSection(completedTasks, 'completed')}
         </div>
 
-        {/* 今日/今週の縦線 */}
+        {/* Today/current week vertical line */}
         {viewMode === 'week' ? (
           (() => {
             const today = new Date();
@@ -979,7 +980,7 @@ export const Timeline: React.FC<TimelineProps> = ({
         )}
       </div>
       
-      {/* カスタムツールチップ（締切ホバー時） */}
+      {/* Custom tooltip (on deadline hover) */}
       {hoveredDeadline && (
         <div
           style={{

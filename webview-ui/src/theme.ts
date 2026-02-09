@@ -1,52 +1,52 @@
 import { ThemeMode, TaskColor } from './types';
 
 export interface ThemeColors {
-  // 背景色
+  // Background colors
   bgPrimary: string;
   bgSecondary: string;
   bgTertiary: string;
   bgHover: string;
   bgSelected: string;
   
-  // テキスト色
+  // Text colors
   textPrimary: string;
   textSecondary: string;
   textMuted: string;
-  textSelected: string; // 選択時のテキスト色
-  textToday: string; // 今日/今月/今週の文字色
-  textSaturday: string; // 土曜の文字色
-  textSunday: string; // 日曜の文字色
+  textSelected: string; // Text color when selected
+  textToday: string; // Text color for today/current month/current week
+  textSaturday: string; // Saturday text color
+  textSunday: string; // Sunday text color
   
-  // ボーダー色
+  // Border colors
   border: string;
   borderLight: string;
   
-  // アクセントカラー
+  // Accent colors
   accent: string;
   accentHover: string;
   
-  // セクション背景
+  // Section backgrounds
   sectionInProgress: string;
   sectionWaiting: string;
   sectionCompleted: string;
-  sectionHeaderBg: string; // セクションヘッダー行の統一背景色
+  sectionHeaderBg: string; // Unified background color for section header row
   
-  // ステータス色
+  // Status colors
   statusInProgress: string;
   statusWaiting: string;
   statusCompleted: string;
   
-  // 入力フィールド
+  // Input fields
   inputBg: string;
   inputBorder: string;
   inputText: string;
   
-  // 週末・今日の背景
+  // Weekend/today backgrounds
   saturdayBg: string;
   sundayBg: string;
-  weekendBg: string; // 互換性のため残す
+  weekendBg: string; // Keep for compatibility
   todayBg: string;
-  // ヘッダー用（不透明）
+  // Header backgrounds (opaque)
   saturdayHeaderBg: string;
   sundayHeaderBg: string;
   todayHeaderBg: string;
@@ -64,8 +64,8 @@ export const darkTheme: ThemeColors = {
   textMuted: '#888888',
   textSelected: '#ffffff',
   textToday: '#ffffff',
-  textSaturday: '#5dadec', // 青系
-  textSunday: '#f07070', // 赤系
+  textSaturday: '#5dadec', // Blue-tinted
+  textSunday: '#f07070', // Red-tinted
   
   border: '#3c3c3c',
   borderLight: '#444444',
@@ -76,7 +76,7 @@ export const darkTheme: ThemeColors = {
   sectionInProgress: 'rgba(0, 122, 204, 0.04)',
   sectionWaiting: 'rgba(136, 136, 136, 0.03)',
   sectionCompleted: 'rgba(78, 201, 176, 0.03)',
-  sectionHeaderBg: '#2a2a2a', // セクションヘッダー行の統一背景色
+  sectionHeaderBg: '#2a2a2a', // Unified background color for section header row
   
   statusInProgress: '#007acc',
   statusWaiting: '#888888',
@@ -86,14 +86,14 @@ export const darkTheme: ThemeColors = {
   inputBorder: '#555555',
   inputText: '#dddddd',
   
-  saturdayBg: 'rgba(93, 173, 236, 0.1)', // 青系の背景
-  sundayBg: 'rgba(240, 112, 112, 0.1)', // 赤系の背景
+  saturdayBg: 'rgba(93, 173, 236, 0.1)', // Blue-tinted background
+  sundayBg: 'rgba(240, 112, 112, 0.1)', // Red-tinted background
   weekendBg: 'rgba(255,255,255,0.015)',
   todayBg: 'rgba(0, 122, 204, 0.15)',
-  // ヘッダー用（不透明）
-  saturdayHeaderBg: '#2a3545', // 青みがかったダーク
-  sundayHeaderBg: '#3d2a2a', // 赤みがかったダーク
-  todayHeaderBg: '#1a4a6e', // 青のダーク
+  // Header backgrounds (opaque)
+  saturdayHeaderBg: '#2a3545', // Blue-tinted dark
+  sundayHeaderBg: '#3d2a2a', // Red-tinted dark
+  todayHeaderBg: '#1a4a6e', // Blue dark
 };
 
 export const lightTheme: ThemeColors = {
@@ -108,8 +108,8 @@ export const lightTheme: ThemeColors = {
   textMuted: '#888888',
   textSelected: '#ffffff',
   textToday: '#003366',
-  textSaturday: '#1a73e8', // 青系
-  textSunday: '#d93025', // 赤系
+  textSaturday: '#1a73e8', // Blue-tinted
+  textSunday: '#d93025', // Red-tinted
   
   border: '#d4d4d4',
   borderLight: '#e0e0e0',
@@ -120,7 +120,7 @@ export const lightTheme: ThemeColors = {
   sectionInProgress: 'rgba(0, 102, 204, 0.08)',
   sectionWaiting: 'rgba(136, 136, 136, 0.06)',
   sectionCompleted: 'rgba(40, 167, 69, 0.06)',
-  sectionHeaderBg: '#e0e0e0', // セクションヘッダー行の統一背景色
+  sectionHeaderBg: '#e0e0e0', // Unified background color for section header row
   
   statusInProgress: '#0066cc',
   statusWaiting: '#666666',
@@ -130,21 +130,21 @@ export const lightTheme: ThemeColors = {
   inputBorder: '#cccccc',
   inputText: '#333333',
   
-  saturdayBg: 'rgba(26, 115, 232, 0.08)', // 青系の背景
-  sundayBg: 'rgba(217, 48, 37, 0.08)', // 赤系の背景
+  saturdayBg: 'rgba(26, 115, 232, 0.08)', // Blue-tinted background
+  sundayBg: 'rgba(217, 48, 37, 0.08)', // Red-tinted background
   weekendBg: 'rgba(0,0,0,0.03)',
   todayBg: 'rgba(0, 102, 204, 0.25)',
-  // ヘッダー用（不透明）
-  saturdayHeaderBg: '#d6e6f9', // 青みがかったライト
-  sundayHeaderBg: '#fde2e0', // 赤みがかったライト
-  todayHeaderBg: '#b3d4f0', // 青のライト
+  // Header backgrounds (opaque)
+  saturdayHeaderBg: '#d6e6f9', // Blue-tinted light
+  sundayHeaderBg: '#fde2e0', // Red-tinted light
+  todayHeaderBg: '#b3d4f0', // Blue light
 };
 
 export const getTheme = (mode: ThemeMode): ThemeColors => {
   return mode === 'dark' ? darkTheme : lightTheme;
 };
 
-// タスクカラーはテーマに応じて調整
+// Task colors are adjusted according to theme
 export const getTaskColors = (mode: ThemeMode): Record<TaskColor, { bg: string; border: string }> => {
   if (mode === 'dark') {
     return {

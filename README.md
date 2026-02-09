@@ -2,6 +2,8 @@
 
 A Gantt chart-style task management extension for VS Code that lets you visually manage tasks and deadlines.
 
+> **Note:** This is a fork of [kitsune8848/task-calendar-extension](https://github.com/kitsune8848/task-calendar-extension). This version has been translated from Japanese to English.
+
 ## Demo
 
 ### Create a Task

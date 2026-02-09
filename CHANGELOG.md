@@ -19,3 +19,12 @@ All notable changes to the "Task Calendar" extension will be documented in this 
 - ダークモード/ライトモード対応
 - VSCodeテーマへの自動追従
 - `.tcal` ファイル形式でのデータ保存
+
+## [1.0.1] - 2026-02-09
+
+### Fixed / Updated
+- Added fork attribution note to README (translated to English)
+- Built and included `webview-ui` production assets (`dist/index.js`, `dist/index.css`)
+- Fixed webview Content-Security-Policy to allow loading local script URIs (`webview.cspSource`)
+- Packaged and installed updated `.vsix` with built webview assets
+

@@ -188,7 +188,7 @@ export class TaskCalendarEditorProvider implements vscode.CustomTextEditorProvid
     const colorTheme = vscode.window.activeColorTheme;
     const isDarkTheme = colorTheme.kind === vscode.ColorThemeKind.Dark || colorTheme.kind === vscode.ColorThemeKind.HighContrast;
     const themeMode = isDarkTheme ? 'dark' : 'light';
-    return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}';"><link href="${styleUri}" rel="stylesheet"><title>Task Calendar</title></head><body data-vscode-theme="${themeMode}"><div id="root"></div><script nonce="${nonce}" src="${scriptUri}"></script></body></html>`;
+    return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src ${webview.cspSource} 'nonce-${nonce}';"><link href="${styleUri}" rel="stylesheet"><title>Task Calendar</title></head><body data-vscode-theme="${themeMode}"><div id="root"></div><script nonce="${nonce}" src="${scriptUri}"></script></body></html>`;
   }
 }
 
